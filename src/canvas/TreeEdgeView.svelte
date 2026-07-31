@@ -2,14 +2,11 @@
   import { BaseEdge, EdgeLabel, type EdgeProps } from '@xyflow/svelte';
   import type { FlowEdge } from '../state/flow';
   import { tree } from '../state/tree.svelte';
-  import { computeEdgeGeometry, cubicPoint, pathString } from './edgeGeometry';
+  import { cubicPoint, pathString } from './edgeGeometry';
 
   let { id, markerEnd, style, data }: EdgeProps<FlowEdge> = $props();
 
-  const geo = $derived.by(() => {
-    const edge = tree.edges.find((e) => e.id === id);
-    return edge ? computeEdgeGeometry(edge, tree.nodes) : null;
-  });
+  const geo = $derived(tree.edgeGeometries.get(id) ?? null);
   const mid = $derived(geo ? cubicPoint(geo, 0.5) : null);
 </script>
 

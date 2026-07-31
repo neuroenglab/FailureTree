@@ -3,7 +3,7 @@ import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side, TextAlign, Tree
 import { defaultEdgeKind } from '../domain/graph';
 import { KIND_LABELS } from '../theme/tokens';
 import { edgeMarker, edgeStyle, makeFlowEdge, makeFlowNode, type EdgeData, type FlowEdge, type FlowNode, type NodeData } from './flow';
-import { computeEdgeGeometry, cubicPoint } from '../canvas/edgeGeometry';
+import { computeAllEdgeGeometries, cubicPoint } from '../canvas/edgeGeometry';
 import { fromDomain, toDomain } from '../persistence/serializer';
 import * as storage from '../persistence/storage';
 
@@ -25,6 +25,9 @@ class TreeStore {
   treeName = $state('');
   treeList = $state.raw<storage.TreeListing[]>([]);
   settings = $state.raw<TreeSettings>({});
+
+  /** Routed curves for every edge, computed in one coordinated pass. */
+  edgeGeometries = $derived(computeAllEdgeGeometries(this.nodes, this.edges));
 
   private createdAt = '';
   private undoStack = $state.raw<Snapshot[]>([]);
@@ -278,7 +281,7 @@ class TreeStore {
     const host = this.edges.find((e) => e.id === hostEdgeId);
     if (!source || !host) return;
 
-    const g = computeEdgeGeometry(host, this.nodes);
+    const g = this.edgeGeometries.get(hostEdgeId);
     if (!g) return;
 
     let bestT = 0.5;

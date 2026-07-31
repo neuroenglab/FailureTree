@@ -13,7 +13,7 @@
   import './flow.css';
   import type { Side } from '../domain/types';
   import { tree } from '../state/tree.svelte';
-  import { computeEdgeGeometry, cubicPoint } from './edgeGeometry';
+  import { cubicPoint } from './edgeGeometry';
   import TreeNodeView from './TreeNodeView.svelte';
   import TreeEdgeView from './TreeEdgeView.svelte';
   import JunctionNodeView from './JunctionNodeView.svelte';
@@ -53,15 +53,11 @@
   // (nodes move, edges reroute), recompute their positions. The effect
   // converges because it only writes when a position actually moved.
   $effect(() => {
-    const nodes = tree.nodes;
-    const edges = tree.edges;
     let changed = false;
-    const updated = nodes.map((n) => {
+    const updated = tree.nodes.map((n) => {
       const j = n.data.junction;
       if (!j || n.data.kind !== 'junction') return n;
-      const host = edges.find((e) => e.id === j.edgeId);
-      if (!host) return n;
-      const g = computeEdgeGeometry(host, nodes);
+      const g = tree.edgeGeometries.get(j.edgeId);
       if (!g) return n;
       const p = cubicPoint(g, j.t);
       const x = p.x - 6;

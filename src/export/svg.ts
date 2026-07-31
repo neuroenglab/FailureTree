@@ -12,7 +12,7 @@ import { KIND_ALIGN, KIND_COLORS, KIND_LABELS } from '../theme/tokens';
 import type { FlowEdge, FlowNode } from '../state/flow';
 import {
   boxCenter,
-  computeEdgeGeometry,
+  computeAllEdgeGeometries,
   cubicPoint,
   isJunction,
   nodeBox,
@@ -107,8 +107,13 @@ function edgeDash(kind: EdgeKind): string {
   return '';
 }
 
-function renderEdge(edge: FlowEdge, nodes: FlowNode[], theme: Theme, labelSize: number): string {
-  const g = computeEdgeGeometry(edge, nodes);
+function renderEdge(
+  edge: FlowEdge,
+  g: EdgeGeometry | undefined,
+  nodes: FlowNode[],
+  theme: Theme,
+  labelSize: number,
+): string {
   if (!g) return '';
   const target = nodes.find((n) => n.id === edge.target);
   const fuseIntoEdge = target ? isJunction(target) : false;
@@ -226,6 +231,7 @@ export function renderTreeSvg(
   if (nodes.length === 0) throw new Error('Nothing to export — the tree is empty.');
   const theme = readTheme();
   const labelSize = settings?.edgeLabelSize ?? EDGE_LABEL_SIZE;
+  const geometries = computeAllEdgeGeometries(nodes, edges);
 
   const boxes = nodes.map(nodeBox);
   const minX = Math.min(...boxes.map((b) => b.x)) - PAD;
@@ -238,7 +244,7 @@ export function renderTreeSvg(
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${minX} ${minY} ${width} ${height}">` +
     `<rect x="${minX}" y="${minY}" width="${width}" height="${height}" fill="${theme.surface}"/>` +
-    edges.map((e) => renderEdge(e, nodes, theme, labelSize)).join('') +
+    edges.map((e) => renderEdge(e, geometries.get(e.id), nodes, theme, labelSize)).join('') +
     nodes
       .map((n) => (isJunction(n) ? renderJunction(n, edges, theme) : renderNode(n, theme)))
       .join('') +
