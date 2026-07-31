@@ -50,7 +50,9 @@ export const EDGE_LABELS: Record<EdgeKind, string> = {
 /** Color themes; palettes live in global.css as :root[data-theme='<id>'] blocks. */
 export const THEMES = [
   { id: 'warm', label: 'Warm (default)' },
-  { id: 'graphite', label: 'Graphite — serious' },
+  { id: 'journal', label: 'Journal — publication figure' },
+  { id: 'boardroom', label: 'Boardroom — corporate' },
+  { id: 'ink', label: 'Ink — black & white' },
   { id: 'paper', label: 'Paper — light' },
   { id: 'blueprint', label: 'Blueprint' },
   { id: 'whiteboard', label: 'Whiteboard' },
