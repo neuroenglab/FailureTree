@@ -64,7 +64,13 @@
   ];
 </script>
 
-{#if node}
+{#if node && node.data.kind === 'junction'}
+  <aside class="inspector" style:width={`${panelWidth}px`}>
+    <span class="kind-tag">Junction</span>
+    <p class="hint">A fused link riding on another arrow. It follows the arrow automatically.</p>
+    <button class="danger" onclick={() => tree.removeNode(node.id)}>Delete junction</button>
+  </aside>
+{:else if node}
   {@const activeToken = node.data.colorToken ?? KIND_COLORS[node.data.kind]}
   {@const activeAlign = node.data.align ?? KIND_ALIGN[node.data.kind]}
   {@const fontSize = node.data.fontSize ?? DEFAULT_FONT_SIZE}

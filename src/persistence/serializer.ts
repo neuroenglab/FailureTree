@@ -31,6 +31,7 @@ export function toDomain(
       align: n.data.align,
       fontSize: n.data.fontSize,
       size: n.width != null && n.height != null ? { width: n.width, height: n.height } : undefined,
+      junction: n.data.junction,
       position: { x: n.position.x, y: n.position.y },
     })),
     edges: edges.map((e) => ({
@@ -47,6 +48,7 @@ export function toDomain(
 
 /** Pure domain document → flow working state. */
 export function fromDomain(doc: FailureTree): { nodes: FlowNode[]; edges: FlowEdge[] } {
+  const junctionIds = new Set(doc.nodes.filter((n) => n.kind === 'junction').map((n) => n.id));
   return {
     nodes: doc.nodes.map((n) =>
       makeFlowNode({
@@ -58,6 +60,7 @@ export function fromDomain(doc: FailureTree): { nodes: FlowNode[]; edges: FlowEd
         align: n.align,
         fontSize: n.fontSize,
         size: n.size,
+        junction: n.junction,
         position: n.position,
       }),
     ),
@@ -70,6 +73,7 @@ export function fromDomain(doc: FailureTree): { nodes: FlowNode[]; edges: FlowEd
         label: e.label,
         sourceHandle: e.fromSide,
         targetHandle: e.toSide,
+        arrowless: junctionIds.has(e.to),
       }),
     ),
   };

@@ -11,13 +11,17 @@
   } from '@xyflow/svelte';
   import '@xyflow/svelte/dist/style.css';
   import './flow.css';
+  import type { Side } from '../domain/types';
   import { tree } from '../state/tree.svelte';
+  import { computeEdgeGeometry, cubicPoint } from './edgeGeometry';
   import TreeNodeView from './TreeNodeView.svelte';
   import TreeEdgeView from './TreeEdgeView.svelte';
+  import JunctionNodeView from './JunctionNodeView.svelte';
   import Toolbar from '../ui/Toolbar.svelte';
 
   const nodeTypes: NodeTypes = {
     'tree-node': TreeNodeView,
+    junction: JunctionNodeView,
   };
 
   const edgeTypes: EdgeTypes = {
@@ -27,6 +31,49 @@
   function onconnect(connection: Connection): void {
     tree.connect(connection);
   }
+
+  /** Dropping a connection on an arrow (not a handle) fuses into it. */
+  const onconnectend: import('@xyflow/svelte').OnConnectEnd = (event, connectionState) => {
+    if (connectionState.isValid || !connectionState.fromNode || !connectionState.to) return;
+    const pointer = 'changedTouches' in event ? event.changedTouches[0] : event;
+    const hostId = document
+      .elementFromPoint(pointer.clientX, pointer.clientY)
+      ?.closest('.svelte-flow__edge')
+      ?.getAttribute('data-id');
+    if (!hostId) return;
+    tree.addJunctionLink(
+      connectionState.fromNode.id,
+      (connectionState.fromHandle?.id as Side | undefined) ?? null,
+      hostId,
+      connectionState.to,
+    );
+  };
+
+  // Junction dots are glued to their host arrow: whenever geometry changes
+  // (nodes move, edges reroute), recompute their positions. The effect
+  // converges because it only writes when a position actually moved.
+  $effect(() => {
+    const nodes = tree.nodes;
+    const edges = tree.edges;
+    let changed = false;
+    const updated = nodes.map((n) => {
+      const j = n.data.junction;
+      if (!j || n.data.kind !== 'junction') return n;
+      const host = edges.find((e) => e.id === j.edgeId);
+      if (!host) return n;
+      const g = computeEdgeGeometry(host, nodes);
+      if (!g) return n;
+      const p = cubicPoint(g, j.t);
+      const x = p.x - 6;
+      const y = p.y - 6;
+      if (Math.abs(x - n.position.x) > 0.5 || Math.abs(y - n.position.y) > 0.5) {
+        changed = true;
+        return { ...n, position: { x, y } };
+      }
+      return n;
+    });
+    if (changed) tree.nodes = updated;
+  });
 </script>
 
 <div class="flow">
@@ -36,12 +83,20 @@
     {nodeTypes}
     {edgeTypes}
     {onconnect}
+    {onconnectend}
     connectionMode={ConnectionMode.Loose}
     onnodedragstart={() => tree.snapshot()}
     onnodedragstop={() => tree.nodesMoved()}
-    onbeforedelete={async () => {
+    onbeforedelete={async ({ nodes, edges }) => {
+      // Expand keyboard deletions with junction cascades before snapshotting.
+      const nodeIds = new Set(nodes.map((n) => n.id));
+      const edgeIds = new Set(edges.map((e) => e.id));
+      tree.expandDeletion(nodeIds, edgeIds);
       tree.snapshot();
-      return true;
+      return {
+        nodes: tree.nodes.filter((n) => nodeIds.has(n.id)),
+        edges: tree.edges.filter((e) => edgeIds.has(e.id)),
+      };
     }}
     deleteKey={['Backspace', 'Delete']}
     fitView

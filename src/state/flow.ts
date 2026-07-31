@@ -53,14 +53,17 @@ export function makeFlowNode(args: {
   align?: TextAlign;
   fontSize?: number;
   size?: { width: number; height: number };
+  junction?: { edgeId: string; t: number };
   position: { x: number; y: number };
 }): FlowNode {
+  const isJunction = args.kind === 'junction';
   return {
     id: args.id,
-    type: 'tree-node',
+    type: isJunction ? 'junction' : 'tree-node',
     position: args.position,
     width: args.size?.width,
     height: args.size?.height,
+    draggable: isJunction ? false : undefined,
     data: {
       kind: args.kind,
       label: args.label,
@@ -68,6 +71,7 @@ export function makeFlowNode(args: {
       colorToken: args.colorToken,
       align: args.align,
       fontSize: args.fontSize,
+      junction: args.junction,
     },
   };
 }
@@ -80,6 +84,8 @@ export function makeFlowEdge(args: {
   label?: string;
   sourceHandle?: Side | null;
   targetHandle?: Side | null;
+  /** Fused arrows (into a junction on another arrow) carry no arrowhead. */
+  arrowless?: boolean;
 }): FlowEdge {
   return {
     id: args.id,
@@ -91,6 +97,6 @@ export function makeFlowEdge(args: {
     class: `edge-${args.kind}`,
     style: edgeStyle(args.kind),
     data: { kind: args.kind, label: args.label },
-    markerEnd: edgeMarker(args.kind),
+    markerEnd: args.arrowless ? undefined : edgeMarker(args.kind),
   };
 }

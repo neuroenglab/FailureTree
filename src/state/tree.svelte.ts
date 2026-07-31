@@ -3,6 +3,7 @@ import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side, TextAlign, Tree
 import { defaultEdgeKind } from '../domain/graph';
 import { KIND_LABELS } from '../theme/tokens';
 import { edgeMarker, edgeStyle, makeFlowEdge, makeFlowNode, type EdgeData, type FlowEdge, type FlowNode, type NodeData } from './flow';
+import { computeEdgeGeometry, cubicPoint } from '../canvas/edgeGeometry';
 import { fromDomain, toDomain } from '../persistence/serializer';
 import * as storage from '../persistence/storage';
 
@@ -219,16 +220,103 @@ class TreeStore {
     this.updateNodeData(id, { fontSize });
   }
 
+  /**
+   * Grow the deletion sets until stable: junctions riding a deleted edge go
+   * too, as do edges touching any deleted node (which may cascade further).
+   */
+  expandDeletion(nodeIds: Set<string>, edgeIds: Set<string>): void {
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const n of this.nodes) {
+        const j = n.data.junction;
+        if (j && !nodeIds.has(n.id) && edgeIds.has(j.edgeId)) {
+          nodeIds.add(n.id);
+          changed = true;
+        }
+      }
+      for (const e of this.edges) {
+        if (!edgeIds.has(e.id) && (nodeIds.has(e.source) || nodeIds.has(e.target))) {
+          edgeIds.add(e.id);
+          changed = true;
+        }
+      }
+    }
+  }
+
   removeNode(id: string): void {
     this.snapshot();
-    this.nodes = this.nodes.filter((n) => n.id !== id);
-    this.edges = this.edges.filter((e) => e.source !== id && e.target !== id);
+    const nodeIds = new Set([id]);
+    const edgeIds = new Set<string>();
+    this.expandDeletion(nodeIds, edgeIds);
+    this.nodes = this.nodes.filter((n) => !nodeIds.has(n.id));
+    this.edges = this.edges.filter((e) => !edgeIds.has(e.id));
     this.scheduleSave();
   }
 
   removeEdge(id: string): void {
     this.snapshot();
-    this.edges = this.edges.filter((e) => e.id !== id);
+    const nodeIds = new Set<string>();
+    const edgeIds = new Set([id]);
+    this.expandDeletion(nodeIds, edgeIds);
+    this.nodes = this.nodes.filter((n) => !nodeIds.has(n.id));
+    this.edges = this.edges.filter((e) => !edgeIds.has(e.id));
+    this.scheduleSave();
+  }
+
+  /**
+   * Link an arrow to another arrow: drop a junction dot on the host edge at
+   * the point nearest to `drop`, and fuse a tip-less arrow into it.
+   */
+  addJunctionLink(
+    sourceId: string,
+    sourceHandle: Side | null,
+    hostEdgeId: string,
+    drop: { x: number; y: number },
+  ): void {
+    const source = this.nodes.find((n) => n.id === sourceId);
+    const host = this.edges.find((e) => e.id === hostEdgeId);
+    if (!source || !host) return;
+
+    const g = computeEdgeGeometry(host, this.nodes);
+    if (!g) return;
+
+    let bestT = 0.5;
+    let bestD = Infinity;
+    for (let i = 0; i <= 64; i++) {
+      const t = 0.08 + (i / 64) * 0.84; // keep clear of the endpoints
+      const p = cubicPoint(g, t);
+      const d = (p.x - drop.x) ** 2 + (p.y - drop.y) ** 2;
+      if (d < bestD) {
+        bestD = d;
+        bestT = t;
+      }
+    }
+    const point = cubicPoint(g, bestT);
+
+    this.snapshot();
+    const junctionId = crypto.randomUUID();
+    this.nodes = [
+      ...this.nodes,
+      makeFlowNode({
+        id: junctionId,
+        kind: 'junction',
+        label: '',
+        junction: { edgeId: hostEdgeId, t: bestT },
+        position: { x: point.x - 6, y: point.y - 6 },
+      }),
+    ];
+    this.edges = [
+      ...this.edges,
+      makeFlowEdge({
+        id: crypto.randomUUID(),
+        source: sourceId,
+        target: junctionId,
+        kind: defaultEdgeKind(source.data.kind, 'junction'),
+        sourceHandle,
+        arrowless: true,
+      }),
+    ];
     this.scheduleSave();
   }
 
@@ -243,7 +331,8 @@ class TreeStore {
 
   /** Copy the selected nodes plus any edges connecting two of them. */
   copySelection(): void {
-    const nodes = this.nodes.filter((n) => n.selected);
+    // Junctions are glued to a host arrow, so they don't survive copying.
+    const nodes = this.nodes.filter((n) => n.selected && n.data.kind !== 'junction');
     if (nodes.length === 0) return;
     const ids = new Set(nodes.map((n) => n.id));
     const edges = this.edges.filter((e) => ids.has(e.source) && ids.has(e.target));
@@ -288,17 +377,17 @@ class TreeStore {
 
   setEdgeKind(id: string, kind: EdgeKind): void {
     this.snapshot();
-    this.edges = this.edges.map((e) =>
-      e.id === id
-        ? {
-            ...e,
-            class: `edge-${kind}`,
-            style: edgeStyle(kind),
-            data: { ...e.data, kind },
-            markerEnd: edgeMarker(kind),
-          }
-        : e,
-    );
+    this.edges = this.edges.map((e) => {
+      if (e.id !== id) return e;
+      const fused = this.nodes.find((n) => n.id === e.target)?.data.kind === 'junction';
+      return {
+        ...e,
+        class: `edge-${kind}`,
+        style: edgeStyle(kind),
+        data: { ...e.data, kind },
+        markerEnd: fused ? undefined : edgeMarker(kind),
+      };
+    });
     this.scheduleSave();
   }
 
