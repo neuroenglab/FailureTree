@@ -95,12 +95,19 @@ Dependency direction is strictly inward:
 
 Each milestone ends with something that runs — no big-bang integration.
 
-1. **Scaffold** — Vite + Svelte + TS strict, folder skeleton, theme tokens, empty canvas rendering.
-2. **Core loop** — typed nodes on canvas, drag, connect arrows, edge kinds. (Already usable!)
-3. **Editing & polish** — inspector panel, color swatches, delete, undo/redo.
-4. **Persistence** — localStorage autosave, multiple trees, JSON import/export.
-5. **Sharing** — SVG export, then PDF.
-6. **Delight pass** — animations, dark mode, empty-state, keyboard shortcuts.
+1. ✅ **Scaffold** — Vite + Svelte + TS strict, folder skeleton, theme tokens, empty canvas rendering.
+2. ✅ **Core loop** — typed nodes on canvas, drag, connect arrows (all four sides), edge kinds.
+3. ✅ **Editing & polish** — inspector panel, color swatches, delete, undo/redo.
+4. ✅ **Persistence** — localStorage autosave, multiple trees, JSON import/export.
+5. ✅ **Sharing** — PNG, SVG, and PDF export.
+6. ✅ **Delight pass** — node pop-in animation, dark mode, empty-state hint.
+
+### Ideas for later
+
+- Keyboard shortcuts for adding nodes; double-click canvas to add.
+- Edge labels (short text on arrows).
+- Checklists on Action nodes.
+- Auto-layout button (tidy the tree).
 
 ## Decisions on record
 

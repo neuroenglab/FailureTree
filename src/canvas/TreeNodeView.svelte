@@ -30,6 +30,7 @@
 <style>
   .tree-node {
     position: relative;
+    animation: pop-in 0.18s ease-out;
     background: var(--n-bg);
     border: 2px solid var(--n-border);
     color: var(--n-ink);
@@ -98,6 +99,17 @@
 
   .note:hover {
     transform: rotate(-0.5deg) translateY(-1px);
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   .tree-node :global(.svelte-flow__handle) {
