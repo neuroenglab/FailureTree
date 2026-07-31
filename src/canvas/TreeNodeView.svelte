@@ -20,8 +20,11 @@
 >
   <span class="kind-tag">{KIND_LABELS[data.kind]}</span>
   <div class="label">{data.label}</div>
-  <Handle type="target" position={Position.Top} />
-  <Handle type="source" position={Position.Bottom} />
+  <!-- Loose connection mode: every handle can start or receive an arrow. -->
+  <Handle id="top" type="source" position={Position.Top} />
+  <Handle id="right" type="source" position={Position.Right} />
+  <Handle id="bottom" type="source" position={Position.Bottom} />
+  <Handle id="left" type="source" position={Position.Left} />
 </div>
 
 <style>
@@ -102,5 +105,12 @@
     height: 10px;
     background: var(--n-border);
     border: 2px solid var(--surface-canvas);
+    opacity: 0.45;
+    transition: opacity 0.12s ease;
+  }
+
+  .tree-node:hover :global(.svelte-flow__handle),
+  .tree-node.selected :global(.svelte-flow__handle) {
+    opacity: 1;
   }
 </style>

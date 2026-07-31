@@ -4,6 +4,7 @@
     Background,
     BackgroundVariant,
     Controls,
+    ConnectionMode,
     type Connection,
     type NodeTypes,
   } from '@xyflow/svelte';
@@ -28,6 +29,7 @@
     bind:edges={tree.edges}
     {nodeTypes}
     {onconnect}
+    connectionMode={ConnectionMode.Loose}
     deleteKey={['Backspace', 'Delete']}
     fitView
   >
