@@ -1,0 +1,383 @@
+{
+  "id": "8b1f0c2e-5a4d-4c7b-9e11-disastertree01",
+  "name": "Disaster Tree v0.1.0",
+  "schemaVersion": 1,
+  "createdAt": "2026-07-31T00:00:00.000Z",
+  "updatedAt": "2026-07-31T00:00:00.000Z",
+  "nodes": [
+    {
+      "id": "i-hd-iemg-3",
+      "kind": "component",
+      "label": "**I** · Does **HD-iEMG (3 cm)** work?",
+      "position": { "x": 60, "y": 40 }
+    },
+    {
+      "id": "i-hd-iemg-2",
+      "kind": "component",
+      "label": "Does **HD-iEMG (2 cm)** work?",
+      "position": { "x": 400, "y": 40 }
+    },
+    {
+      "id": "i-hd-semg",
+      "kind": "component",
+      "label": "Does **HD-sEMG** work?",
+      "position": { "x": 740, "y": 40 }
+    },
+    {
+      "id": "i-imu",
+      "kind": "component",
+      "label": "Does **IMU** work?\n*(residual movement)*",
+      "position": { "x": 1080, "y": 40 }
+    },
+    {
+      "id": "i-none",
+      "kind": "failure",
+      "label": "**NONE**\n*no usable signal source*",
+      "position": { "x": 1430, "y": 40 }
+    },
+    {
+      "id": "i-residual",
+      "kind": "action",
+      "label": "Residual movements",
+      "position": { "x": 1080, "y": 230 }
+    },
+
+    {
+      "id": "ii-artifacts",
+      "kind": "experiment",
+      "label": "**II** · Do we see stim artifacts?",
+      "position": { "x": 60, "y": 420 }
+    },
+    {
+      "id": "ii-fixed-hz",
+      "kind": "experiment",
+      "label": "At fixed Hz?",
+      "position": { "x": 440, "y": 420 }
+    },
+    {
+      "id": "ii-template",
+      "kind": "action",
+      "label": "Template removal",
+      "position": { "x": 440, "y": 590 }
+    },
+    {
+      "id": "ii-blanking",
+      "kind": "action",
+      "label": "Blanking",
+      "position": { "x": 730, "y": 590 }
+    },
+    {
+      "id": "ii-preproc",
+      "kind": "action",
+      "label": "Classic EMG preproc",
+      "position": { "x": 60, "y": 620 }
+    },
+
+    {
+      "id": "iii-decompose",
+      "kind": "experiment",
+      "label": "**III** · Can we decompose *unique* motor units?",
+      "position": { "x": 60, "y": 860 }
+    },
+    {
+      "id": "iii-mud",
+      "kind": "action",
+      "label": "Motor unit decomposition",
+      "position": { "x": 60, "y": 1040 }
+    },
+    {
+      "id": "iii-controllable",
+      "kind": "experiment",
+      "label": "Controllable?\n*(online)*",
+      "position": { "x": 60, "y": 1220 }
+    },
+    {
+      "id": "iii-prop-control",
+      "kind": "action",
+      "label": "Prop. control",
+      "position": { "x": 60, "y": 1400 }
+    },
+    {
+      "id": "iii-tonic",
+      "kind": "experiment",
+      "label": "Are they tonic units?",
+      "position": { "x": 420, "y": 1220 }
+    },
+    {
+      "id": "iii-class-control",
+      "kind": "action",
+      "label": "Class. control",
+      "position": { "x": 420, "y": 1400 }
+    },
+    {
+      "id": "iii-cnn-trials",
+      "kind": "experiment",
+      "label": "Do we have enough trials to train a **CNN**?",
+      "position": { "x": 790, "y": 860 }
+    },
+    {
+      "id": "iii-ml",
+      "kind": "action",
+      "label": "Machine learning\n*(classical)*",
+      "position": { "x": 790, "y": 1060 }
+    },
+    {
+      "id": "iii-dl",
+      "kind": "action",
+      "label": "Deep learning",
+      "position": { "x": 1160, "y": 860 }
+    },
+    {
+      "id": "iii-prop-control-2",
+      "kind": "action",
+      "label": "Prop. control",
+      "position": { "x": 1160, "y": 1040 }
+    },
+    {
+      "id": "iii-go-to-iv",
+      "kind": "note",
+      "label": "Go to **IV**",
+      "position": { "x": 1160, "y": 1220 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e01",
+      "from": "i-hd-iemg-3",
+      "to": "i-hd-iemg-2",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e02",
+      "from": "i-hd-iemg-2",
+      "to": "i-hd-semg",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e03",
+      "from": "i-hd-semg",
+      "to": "i-imu",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e04",
+      "from": "i-imu",
+      "to": "i-none",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e05",
+      "from": "i-hd-iemg-3",
+      "to": "ii-artifacts",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e06",
+      "from": "i-hd-iemg-2",
+      "to": "ii-artifacts",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "e07",
+      "from": "i-hd-semg",
+      "to": "ii-artifacts",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "e08",
+      "from": "i-imu",
+      "to": "i-residual",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e09",
+      "from": "i-residual",
+      "to": "iii-class-control",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+
+    {
+      "id": "e10",
+      "from": "ii-artifacts",
+      "to": "ii-fixed-hz",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e11",
+      "from": "ii-artifacts",
+      "to": "ii-preproc",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e12",
+      "from": "ii-fixed-hz",
+      "to": "ii-template",
+      "kind": "mitigated-by",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e13",
+      "from": "ii-fixed-hz",
+      "to": "ii-blanking",
+      "kind": "mitigated-by",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "e14",
+      "from": "ii-template",
+      "to": "ii-preproc",
+      "kind": "leads-to",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "e15",
+      "from": "ii-blanking",
+      "to": "ii-preproc",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "bottom"
+    },
+    {
+      "id": "e16",
+      "from": "ii-preproc",
+      "to": "iii-decompose",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+
+    {
+      "id": "e17",
+      "from": "iii-decompose",
+      "to": "iii-mud",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e18",
+      "from": "iii-decompose",
+      "to": "iii-cnn-trials",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e19",
+      "from": "iii-mud",
+      "to": "iii-controllable",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e20",
+      "from": "iii-controllable",
+      "to": "iii-prop-control",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e21",
+      "from": "iii-controllable",
+      "to": "iii-tonic",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e22",
+      "from": "iii-tonic",
+      "to": "iii-cnn-trials",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "e23",
+      "from": "iii-tonic",
+      "to": "iii-class-control",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e24",
+      "from": "iii-cnn-trials",
+      "to": "iii-dl",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e25",
+      "from": "iii-cnn-trials",
+      "to": "iii-ml",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e26",
+      "from": "iii-dl",
+      "to": "iii-prop-control-2",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e27",
+      "from": "iii-prop-control-2",
+      "to": "iii-go-to-iv",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ]
+}
