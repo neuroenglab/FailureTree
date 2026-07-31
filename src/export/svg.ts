@@ -244,13 +244,41 @@ export function renderTreeSvg(
   const labelSize = settings?.edgeLabelSize ?? EDGE_LABEL_SIZE;
   const geometries = computeAllEdgeGeometries(nodes, edges);
 
-  const boxes = nodes.map(nodeBox);
-  const minX = Math.min(...boxes.map((b) => b.x)) - PAD;
-  const minY = Math.min(...boxes.map((b) => b.y)) - PAD;
-  const maxX = Math.max(...boxes.map((b) => b.x + b.width)) + PAD;
-  const maxY = Math.max(...boxes.map((b) => b.y + b.height)) + PAD;
-  const width = Math.round(maxX - minX);
-  const height = Math.round(maxY - minY);
+  // Frame nodes AND arrow curves (they can bow past the outermost nodes),
+  // plus the label pills sitting at curve midpoints.
+  let bMinX = Infinity;
+  let bMinY = Infinity;
+  let bMaxX = -Infinity;
+  let bMaxY = -Infinity;
+  const extend = (x: number, y: number) => {
+    bMinX = Math.min(bMinX, x);
+    bMinY = Math.min(bMinY, y);
+    bMaxX = Math.max(bMaxX, x);
+    bMaxY = Math.max(bMaxY, y);
+  };
+  for (const b of nodes.map(nodeBox)) {
+    extend(b.x, b.y);
+    extend(b.x + b.width, b.y + b.height);
+  }
+  for (const e of edges) {
+    const g = geometries.get(e.id);
+    if (!g) continue;
+    for (let i = 0; i <= 12; i++) {
+      const p = cubicPoint(g, i / 12);
+      extend(p.x, p.y);
+    }
+    const label = e.data?.label;
+    if (label) {
+      const mid = cubicPoint(g, 0.5);
+      const half = measure({ text: label, bold: true, italic: false }, label, labelSize) / 2 + 8;
+      extend(mid.x - half, mid.y - labelSize);
+      extend(mid.x + half, mid.y + labelSize);
+    }
+  }
+  const minX = Math.floor(bMinX) - PAD;
+  const minY = Math.floor(bMinY) - PAD;
+  const width = Math.round(bMaxX - bMinX) + PAD * 2;
+  const height = Math.round(bMaxY - bMinY) + PAD * 2;
 
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${minX} ${minY} ${width} ${height}">` +

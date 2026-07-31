@@ -65,7 +65,7 @@
     <summary>Export</summary>
     <div class="menu">
       <button onclick={() => runExport(() => downloadJson(tree.toDocument()))}>JSON (re-importable)</button>
-      <button onclick={() => runExport(() => exportPng(tree.nodes, tree.treeName))}>PNG image</button>
+      <button onclick={() => runExport(() => exportPng(tree.nodes, tree.edges, tree.treeName))}>PNG image</button>
       <button onclick={() => runExport(() => exportSvg(tree.nodes, tree.edges, tree.treeName, tree.settings))}>SVG image</button>
       <button onclick={() => runExport(() => exportPdf(tree.nodes, tree.edges, tree.treeName, tree.settings))}>PDF</button>
     </div>

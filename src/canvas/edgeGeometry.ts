@@ -257,6 +257,36 @@ function makeStraight(from: Pt, to: Pt): EdgeGeometry {
   };
 }
 
+/**
+ * Bounding box of the whole graph INCLUDING routed arrow curves — arrows can
+ * bow past the outermost nodes, and exports must not clip them.
+ */
+export function graphBounds(nodes: FlowNode[], edges: FlowEdge[]): Box {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  const extend = (x: number, y: number) => {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  };
+
+  for (const n of nodes) {
+    const b = nodeBox(n);
+    extend(b.x, b.y);
+    extend(b.x + b.width, b.y + b.height);
+  }
+  for (const g of computeAllEdgeGeometries(nodes, edges).values()) {
+    for (let i = 0; i <= 12; i++) {
+      const p = cubicPoint(g, i / 12);
+      extend(p.x, p.y);
+    }
+  }
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+}
+
 /** Full geometry for an edge given the current nodes; null if endpoints are missing. */
 export function computeEdgeGeometry(edge: FlowEdge, nodes: FlowNode[]): EdgeGeometry | null {
   const e = endpointsOf(edge, nodes);
