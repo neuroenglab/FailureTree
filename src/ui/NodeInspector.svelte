@@ -12,6 +12,30 @@
   const MIN_FONT_SIZE = 10;
   const MAX_FONT_SIZE = 28;
 
+  // Panel width: draggable via the left-edge grip, remembered across sessions.
+  const WIDTH_KEY = 'failuretree:ui:inspector-width';
+  const MIN_WIDTH = 220;
+  const MAX_WIDTH = 460;
+  let panelWidth = $state(Number(localStorage.getItem(WIDTH_KEY)) || 250);
+
+  function startResize(event: PointerEvent): void {
+    const grip = event.currentTarget as HTMLElement;
+    const startX = event.clientX;
+    const startWidth = panelWidth;
+    grip.setPointerCapture(event.pointerId);
+
+    const onMove = (e: PointerEvent) => {
+      panelWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth + (startX - e.clientX)));
+    };
+    const onUp = () => {
+      grip.removeEventListener('pointermove', onMove);
+      grip.removeEventListener('pointerup', onUp);
+      localStorage.setItem(WIDTH_KEY, String(Math.round(panelWidth)));
+    };
+    grip.addEventListener('pointermove', onMove);
+    grip.addEventListener('pointerup', onUp);
+  }
+
   /** Step the font size, snapping back to "unset" when it lands on the default. */
   function stepFont(current: number, delta: number): number | undefined {
     const next = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Math.round(current) + delta));
@@ -28,7 +52,15 @@
   {@const activeToken = node.data.colorToken ?? KIND_COLORS[node.data.kind]}
   {@const activeAlign = node.data.align ?? KIND_ALIGN[node.data.kind]}
   {@const fontSize = node.data.fontSize ?? DEFAULT_FONT_SIZE}
-  <aside class="inspector">
+  <aside class="inspector" style:width={`${panelWidth}px`}>
+    <div
+      class="grip"
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize panel"
+      title="Drag to resize panel"
+      onpointerdown={startResize}
+    ></div>
     <span class="kind-tag">{KIND_LABELS[node.data.kind]}</span>
 
     <label>
@@ -103,7 +135,15 @@
     <button class="danger" onclick={() => tree.removeNode(node.id)}>Delete node</button>
   </aside>
 {:else if edge}
-  <aside class="inspector">
+  <aside class="inspector" style:width={`${panelWidth}px`}>
+    <div
+      class="grip"
+      role="separator"
+      aria-orientation="vertical"
+      aria-label="Resize panel"
+      title="Drag to resize panel"
+      onpointerdown={startResize}
+    ></div>
     <span class="kind-tag">Arrow</span>
 
     <label>
@@ -140,7 +180,6 @@
     position: absolute;
     top: 16px;
     right: 16px;
-    width: 250px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -150,6 +189,23 @@
     padding: 14px;
     box-shadow: var(--shadow-lifted);
     z-index: 20;
+  }
+
+  .grip {
+    position: absolute;
+    top: 0;
+    left: -3px;
+    width: 8px;
+    height: 100%;
+    cursor: ew-resize;
+    border-radius: 8px;
+    touch-action: none;
+  }
+
+  .grip:hover,
+  .grip:active {
+    background: var(--swatch-indigo-border);
+    opacity: 0.35;
   }
 
   .kind-tag {
