@@ -152,6 +152,10 @@ interface Endpoints {
   fromSide: Side;
   to: Pt;
   toSide: Side;
+  source: FlowNode;
+  target: FlowNode;
+  sourceBox: Box;
+  targetBox: Box;
   obstacles: Box[];
 }
 
@@ -169,10 +173,78 @@ function endpointsOf(edge: FlowEdge, nodes: FlowNode[]): Endpoints | null {
     fromSide,
     to: isJunction(target) ? boxCenter(targetBox) : anchor(targetBox, toSide),
     toSide,
+    source,
+    target,
+    sourceBox,
+    targetBox,
     obstacles: nodes
       .filter((n) => n.id !== source.id && n.id !== target.id && !isJunction(n))
       .map(nodeBox),
   };
+}
+
+// --- axis snapping for straight arrows ---------------------------------------
+
+/** Nearly-aligned straight arrows snap to exact horizontal/vertical. */
+const AXIS_SNAP_DIST = 40;
+
+function cornerRadius(node: FlowNode, box: Box): number {
+  const kind = node.data.kind;
+  if (kind === 'action') return box.height / 2;
+  if (kind === 'experiment') return 18;
+  if (kind === 'failure') return 4;
+  return 8;
+}
+
+/** The flat stretch of a node side an anchor may slide along. */
+function slideRange(node: FlowNode, box: Box, axis: 'x' | 'y'): [number, number] {
+  const r = cornerRadius(node, box) + 4;
+  return axis === 'y' ? [box.y + r, box.y + box.height - r] : [box.x + r, box.x + box.width - r];
+}
+
+/**
+ * If both endpoints sit on horizontally-facing sides (or a junction) and are
+ * within snapping distance, slide the anchors along their node borders until
+ * the line is exactly horizontal — likewise for vertical. Junctions cannot
+ * move, so the node-side anchor does all the sliding.
+ */
+function applyAxisSnap(ep: Endpoints): void {
+  const sJ = isJunction(ep.source);
+  const tJ = isJunction(ep.target);
+
+  const AXES: { axis: 'x' | 'y'; sides: Side[] }[] = [
+    { axis: 'y', sides: ['left', 'right'] },
+    { axis: 'x', sides: ['top', 'bottom'] },
+  ];
+  for (const { axis, sides } of AXES) {
+    const fromOk = sJ || sides.includes(ep.fromSide);
+    const toOk = tJ || sides.includes(ep.toSide);
+    if (!fromOk || !toOk) continue;
+    if (Math.abs(ep.from[axis] - ep.to[axis]) > AXIS_SNAP_DIST) continue;
+
+    let lo = -Infinity;
+    let hi = Infinity;
+    if (!sJ) {
+      const [a, b] = slideRange(ep.source, ep.sourceBox, axis);
+      lo = Math.max(lo, a);
+      hi = Math.min(hi, b);
+    }
+    if (!tJ) {
+      const [a, b] = slideRange(ep.target, ep.targetBox, axis);
+      lo = Math.max(lo, a);
+      hi = Math.min(hi, b);
+    }
+    if (lo > hi) continue;
+
+    // Junction endpoints are fixed points; otherwise meet in the middle.
+    const wanted = sJ ? ep.from[axis] : tJ ? ep.to[axis] : (ep.from[axis] + ep.to[axis]) / 2;
+    const value = Math.min(hi, Math.max(lo, wanted));
+    if ((sJ || tJ) && Math.abs(value - wanted) > 0.5) continue; // junction out of reach
+
+    ep.from = { ...ep.from, [axis]: value };
+    ep.to = { ...ep.to, [axis]: value };
+    return;
+  }
 }
 
 /** A degenerate cubic lying exactly on the from→to chord. */
@@ -189,7 +261,10 @@ function makeStraight(from: Pt, to: Pt): EdgeGeometry {
 export function computeEdgeGeometry(edge: FlowEdge, nodes: FlowNode[]): EdgeGeometry | null {
   const e = endpointsOf(edge, nodes);
   if (!e) return null;
-  if (edge.data?.straight) return makeStraight(e.from, e.to);
+  if (edge.data?.straight) {
+    applyAxisSnap(e);
+    return makeStraight(e.from, e.to);
+  }
   return routeCubic(e.from, e.fromSide, e.to, e.toSide, e.obstacles);
 }
 
@@ -288,6 +363,7 @@ export function computeAllEdgeGeometries(
     const ep = endpointsOf(e, nodes);
     if (!ep) continue;
     if (e.data?.straight) {
+      applyAxisSnap(ep);
       const g = makeStraight(ep.from, ep.to);
       map.set(e.id, g);
       polys.set(e.id, samplePolyline(g));
