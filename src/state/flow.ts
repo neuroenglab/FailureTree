@@ -28,6 +28,17 @@ export function edgeMarker(kind: EdgeKind) {
   };
 }
 
+/**
+ * Edge visuals are INLINE (not stylesheet classes) so they survive
+ * image export — html-to-image doesn't inline styles of nested SVG children.
+ */
+export function edgeStyle(kind: EdgeKind): string {
+  const base = `stroke: var(--edge-${kind}); stroke-width: 2.2;`;
+  if (kind === 'if-fails') return `${base} stroke-dasharray: 8 5;`;
+  if (kind === 'mitigated-by') return `${base} stroke-dasharray: 2 6; stroke-linecap: round;`;
+  return base;
+}
+
 export function makeFlowNode(args: {
   id: string;
   kind: NodeKind;
@@ -64,6 +75,7 @@ export function makeFlowEdge(args: {
     sourceHandle: args.sourceHandle ?? undefined,
     targetHandle: args.targetHandle ?? undefined,
     class: `edge-${args.kind}`,
+    style: edgeStyle(args.kind),
     data: { kind: args.kind },
     markerEnd: edgeMarker(args.kind),
   };

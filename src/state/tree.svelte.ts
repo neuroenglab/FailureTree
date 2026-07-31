@@ -2,7 +2,7 @@ import type { Connection } from '@xyflow/svelte';
 import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side } from '../domain/types';
 import { defaultEdgeKind } from '../domain/graph';
 import { KIND_LABELS } from '../theme/tokens';
-import { edgeMarker, makeFlowEdge, makeFlowNode, type FlowEdge, type FlowNode, type NodeData } from './flow';
+import { edgeMarker, edgeStyle, makeFlowEdge, makeFlowNode, type FlowEdge, type FlowNode, type NodeData } from './flow';
 import { fromDomain, toDomain } from '../persistence/serializer';
 import * as storage from '../persistence/storage';
 
@@ -217,7 +217,13 @@ class TreeStore {
     this.snapshot();
     this.edges = this.edges.map((e) =>
       e.id === id
-        ? { ...e, class: `edge-${kind}`, data: { ...e.data, kind }, markerEnd: edgeMarker(kind) }
+        ? {
+            ...e,
+            class: `edge-${kind}`,
+            style: edgeStyle(kind),
+            data: { ...e.data, kind },
+            markerEnd: edgeMarker(kind),
+          }
         : e,
     );
     this.scheduleSave();

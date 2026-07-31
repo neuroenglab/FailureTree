@@ -1,9 +1,21 @@
 <script lang="ts">
   import { tree } from '../state/tree.svelte';
   import { downloadJson, readJsonFile } from '../export/json';
+  import { exportPdf, exportPng, exportSvg } from '../export/image';
 
   let fileInput: HTMLInputElement;
+  let exportMenu: HTMLDetailsElement;
   let importError = $state('');
+
+  async function runExport(fn: () => Promise<void> | void): Promise<void> {
+    exportMenu.open = false;
+    importError = '';
+    try {
+      await fn();
+    } catch (error) {
+      importError = error instanceof Error ? error.message : 'Export failed.';
+    }
+  }
 
   function onPick(event: Event): void {
     const id = (event.currentTarget as HTMLSelectElement).value;
@@ -47,7 +59,15 @@
     title="Rename this tree"
   />
 
-  <button title="Export as JSON" onclick={() => downloadJson(tree.toDocument())}>Export</button>
+  <details class="export" bind:this={exportMenu}>
+    <summary>Export</summary>
+    <div class="menu">
+      <button onclick={() => runExport(() => downloadJson(tree.toDocument()))}>JSON (re-importable)</button>
+      <button onclick={() => runExport(() => exportPng(tree.nodes, tree.treeName))}>PNG image</button>
+      <button onclick={() => runExport(() => exportSvg(tree.nodes, tree.treeName))}>SVG image</button>
+      <button onclick={() => runExport(() => exportPdf(tree.nodes, tree.treeName))}>PDF</button>
+    </div>
+  </details>
   <button title="Import a JSON tree" onclick={() => fileInput.click()}>Import</button>
   <button class="delete" title="Delete this tree" onclick={onDelete}>🗑</button>
 
@@ -111,6 +131,59 @@
 
   .delete {
     padding: 5px 8px;
+  }
+
+  .export {
+    position: relative;
+  }
+
+  .export summary {
+    list-style: none;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-strong);
+    background: var(--surface-canvas);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .export summary::after {
+    content: ' ▾';
+    font-size: 0.7em;
+  }
+
+  .export[open] summary,
+  .export summary:hover {
+    background: var(--line-soft);
+  }
+
+  .menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 170px;
+    background: var(--surface-panel);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-md);
+    padding: 5px;
+    box-shadow: var(--shadow-lifted);
+    z-index: 50;
+  }
+
+  .menu button {
+    text-align: left;
+    background: none;
+    border: none;
+  }
+
+  .menu button:hover {
+    background: var(--surface-canvas);
   }
 
   .error {
