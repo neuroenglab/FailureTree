@@ -1,0 +1,51 @@
+/* Global styling for Svelte Flow internals — edges, handles, controls. */
+
+.svelte-flow__edge-path {
+  stroke-width: 2.2;
+}
+
+.svelte-flow__edge.edge-leads-to .svelte-flow__edge-path {
+  stroke: var(--edge-leads-to);
+}
+
+.svelte-flow__edge.edge-if-fails .svelte-flow__edge-path {
+  stroke: var(--edge-if-fails);
+  stroke-dasharray: 8 5;
+}
+
+.svelte-flow__edge.edge-mitigated-by .svelte-flow__edge-path {
+  stroke: var(--edge-mitigated-by);
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+}
+
+.svelte-flow__edge.selected .svelte-flow__edge-path {
+  stroke-width: 3;
+}
+
+.svelte-flow__connection-path {
+  stroke: var(--ink-muted);
+  stroke-width: 2.2;
+  stroke-dasharray: 6 4;
+}
+
+.svelte-flow__controls {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--line-soft);
+}
+
+.svelte-flow__controls-button {
+  background: var(--surface-panel);
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--ink-strong);
+}
+
+.svelte-flow__controls-button:hover {
+  background: var(--surface-canvas);
+}
+
+.svelte-flow__controls-button svg {
+  fill: var(--ink-strong);
+}
