@@ -90,7 +90,18 @@ function wrapLines(lines: Line[], maxWidth: number, size: number): Line[] {
 }
 
 function lineToTspans(line: Line): string {
-  return line
+  // Merge consecutive same-style segments into ONE tspan: per-word tspans
+  // make svg2pdf insert extra advance between words in the exported PDF.
+  const merged: Segment[] = [];
+  for (const seg of line) {
+    const last = merged[merged.length - 1];
+    if (last && last.bold === seg.bold && last.italic === seg.italic) {
+      last.text += seg.text;
+    } else {
+      merged.push({ ...seg });
+    }
+  }
+  return merged
     .map((seg) => {
       const style =
         `font-weight="${seg.bold ? 800 : 600}"` + (seg.italic ? ' font-style="italic"' : '');

@@ -47,6 +47,8 @@ export interface TreeEdge {
   to: string;
   kind: EdgeKind;
   label?: string;
+  /** Drawn as a straight line instead of a routed curve. */
+  straight?: boolean;
   fromSide?: Side;
   toSide?: Side;
 }
@@ -57,6 +59,8 @@ export interface TreeSettings {
   edgeLabelSize?: number;
   /** Canvas background token; unset means the default warm cream. */
   canvas?: string;
+  /** Color theme token; unset means the default warm theme. */
+  theme?: string;
 }
 
 export interface FailureTree {

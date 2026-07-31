@@ -323,6 +323,11 @@ class TreeStore {
     this.scheduleSave();
   }
 
+  setEdgeStraight(id: string, straight: boolean): void {
+    this.snapshot();
+    this.updateEdgeData(id, { straight: straight || undefined });
+  }
+
   updateEdgeData(id: string, patch: Partial<EdgeData>): void {
     this.edges = this.edges.map((e) =>
       e.id === id ? { ...e, data: { kind: e.data?.kind ?? 'leads-to', ...e.data, ...patch } } : e,

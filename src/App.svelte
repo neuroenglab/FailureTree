@@ -9,7 +9,13 @@
   // and exports all read these custom properties from the root element).
   $effect(() => {
     const root = document.documentElement.style;
-    const canvas = tree.settings.canvas;
+    const theme = tree.settings.theme;
+    if (theme && theme !== 'warm') document.documentElement.dataset.theme = theme;
+    else delete document.documentElement.dataset.theme;
+
+    // The canvas-background override only applies to the default theme —
+    // other themes own their canvas (inline vars would beat [data-theme]).
+    const canvas = !theme || theme === 'warm' ? tree.settings.canvas : undefined;
     if (canvas) {
       root.setProperty('--surface-canvas', `var(--bg-${canvas}-canvas)`);
       root.setProperty('--surface-grid-dot', `var(--bg-${canvas}-dot)`);

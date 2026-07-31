@@ -47,6 +47,15 @@ export const EDGE_LABELS: Record<EdgeKind, string> = {
   'mitigated-by': 'mitigated by',
 };
 
+/** Color themes; palettes live in global.css as :root[data-theme='<id>'] blocks. */
+export const THEMES = [
+  { id: 'warm', label: 'Warm (default)' },
+  { id: 'graphite', label: 'Graphite — serious' },
+  { id: 'paper', label: 'Paper — light' },
+  { id: 'blueprint', label: 'Blueprint' },
+  { id: 'whiteboard', label: 'Whiteboard' },
+] as const;
+
 /** Canvas background choices; colors live in global.css as --bg-<id>-canvas/-dot. */
 export const CANVAS_TOKENS = [
   { id: 'cream', label: 'Cream' },

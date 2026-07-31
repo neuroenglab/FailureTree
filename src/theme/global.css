@@ -140,6 +140,148 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Themes — selected per tree in Settings. Each block overrides the default
+   (adaptive) warm palette with fixed colors; [data-theme] specificity wins
+   over both the light and dark :root blocks.
+   --------------------------------------------------------------------------- */
+
+/* Graphite — serious, desaturated. */
+:root[data-theme='graphite'] {
+  --surface-canvas: #f4f4f6;
+  --surface-panel: #ffffff;
+  --surface-grid-dot: #dfdfe3;
+  --ink-strong: #26272b;
+  --ink-muted: #73757c;
+  --line-soft: #e4e4e8;
+  --shadow-soft: 0 2px 10px rgba(30, 30, 40, 0.08);
+  --shadow-lifted: 0 6px 24px rgba(30, 30, 40, 0.14);
+
+  --swatch-indigo-bg: #e9eaef;
+  --swatch-indigo-border: #8f94a8;
+  --swatch-indigo-ink: #41465c;
+  --swatch-sand-bg: #ededea;
+  --swatch-sand-border: #a8a394;
+  --swatch-sand-ink: #565040;
+  --swatch-terracotta-bg: #efe7e5;
+  --swatch-terracotta-border: #b08a81;
+  --swatch-terracotta-ink: #5f4038;
+  --swatch-sage-bg: #e9ece8;
+  --swatch-sage-border: #93a291;
+  --swatch-sage-ink: #44513f;
+  --swatch-butter-bg: #efece1;
+  --swatch-butter-border: #b3ab8b;
+  --swatch-butter-ink: #5c553c;
+  --swatch-rose-bg: #efe7ea;
+  --swatch-rose-border: #b08e9c;
+  --swatch-rose-ink: #5c4250;
+  --swatch-sky-bg: #e6ebee;
+  --swatch-sky-border: #8aa2b0;
+  --swatch-sky-ink: #3d4f5a;
+  --swatch-plum-bg: #ece8ee;
+  --swatch-plum-border: #a291ad;
+  --swatch-plum-ink: #4e4258;
+
+  --edge-leads-to: #8b8d93;
+  --edge-if-fails: #b06258;
+  --edge-mitigated-by: #71926f;
+}
+
+/* Paper — clean, bright, neutral; keeps the warm swatches. */
+:root[data-theme='paper'] {
+  --surface-canvas: #ffffff;
+  --surface-panel: #fafafa;
+  --surface-grid-dot: #ebebeb;
+  --ink-strong: #202124;
+  --ink-muted: #80838a;
+  --line-soft: #e8e8e8;
+  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.07);
+  --shadow-lifted: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Blueprint — technical drawing: deep blue canvas, chalk-colored strokes. */
+:root[data-theme='blueprint'] {
+  color-scheme: dark;
+  --surface-canvas: #142a4d;
+  --surface-panel: #1b345c;
+  --surface-grid-dot: #26426f;
+  --ink-strong: #dfeafc;
+  --ink-muted: #93abd0;
+  --line-soft: #2d4a7c;
+  --shadow-soft: 0 2px 10px rgba(4, 12, 28, 0.45);
+  --shadow-lifted: 0 6px 24px rgba(4, 12, 28, 0.55);
+
+  --swatch-indigo-bg: #1e3a66;
+  --swatch-indigo-border: #9fb6ff;
+  --swatch-indigo-ink: #d7e2ff;
+  --swatch-sand-bg: #1e3a66;
+  --swatch-sand-border: #e6d69a;
+  --swatch-sand-ink: #f3ead0;
+  --swatch-terracotta-bg: #1e3a66;
+  --swatch-terracotta-border: #ff9e8a;
+  --swatch-terracotta-ink: #ffd3c8;
+  --swatch-sage-bg: #1e3a66;
+  --swatch-sage-border: #8fe0ac;
+  --swatch-sage-ink: #d2f2dd;
+  --swatch-butter-bg: #1e3a66;
+  --swatch-butter-border: #f5e79a;
+  --swatch-butter-ink: #faf2cd;
+  --swatch-rose-bg: #1e3a66;
+  --swatch-rose-border: #f2a8c4;
+  --swatch-rose-ink: #fbd8e6;
+  --swatch-sky-bg: #1e3a66;
+  --swatch-sky-border: #8fd4f0;
+  --swatch-sky-ink: #d3eef9;
+  --swatch-plum-bg: #1e3a66;
+  --swatch-plum-border: #cfa8ef;
+  --swatch-plum-ink: #ead8fa;
+
+  --edge-leads-to: #a9c2e8;
+  --edge-if-fails: #ff8f7a;
+  --edge-mitigated-by: #7ce0a8;
+}
+
+/* Whiteboard — white canvas, marker-pen outlines (like the original photo). */
+:root[data-theme='whiteboard'] {
+  --surface-canvas: #fdfdfd;
+  --surface-panel: #ffffff;
+  --surface-grid-dot: #e9e9e9;
+  --ink-strong: #1f2937;
+  --ink-muted: #8a8f98;
+  --line-soft: #e5e7eb;
+  --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.07);
+  --shadow-lifted: 0 6px 24px rgba(0, 0, 0, 0.12);
+
+  --swatch-indigo-bg: #ffffff;
+  --swatch-indigo-border: #2f5bbf;
+  --swatch-indigo-ink: #2f5bbf;
+  --swatch-sand-bg: #ffffff;
+  --swatch-sand-border: #374151;
+  --swatch-sand-ink: #374151;
+  --swatch-terracotta-bg: #ffffff;
+  --swatch-terracotta-border: #c43c3c;
+  --swatch-terracotta-ink: #c43c3c;
+  --swatch-sage-bg: #ffffff;
+  --swatch-sage-border: #2e8b57;
+  --swatch-sage-ink: #2e8b57;
+  --swatch-butter-bg: #ffffff;
+  --swatch-butter-border: #d97706;
+  --swatch-butter-ink: #d97706;
+  --swatch-rose-bg: #ffffff;
+  --swatch-rose-border: #d6549c;
+  --swatch-rose-ink: #d6549c;
+  --swatch-sky-bg: #ffffff;
+  --swatch-sky-border: #0e7490;
+  --swatch-sky-ink: #0e7490;
+  --swatch-plum-bg: #ffffff;
+  --swatch-plum-border: #7c3aed;
+  --swatch-plum-ink: #7c3aed;
+
+  --edge-leads-to: #2f5bbf;
+  --edge-if-fails: #c43c3c;
+  --edge-mitigated-by: #2e8b57;
+}
+
+/* ---------------------------------------------------------------------------
    Base styles
    --------------------------------------------------------------------------- */
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CANVAS_TOKENS } from '../theme/tokens';
+  import { CANVAS_TOKENS, THEMES } from '../theme/tokens';
   import { tree } from '../state/tree.svelte';
 
   const DEFAULT_EDGE_LABEL_SIZE = 11.5;
@@ -8,6 +8,7 @@
 
   const size = $derived(tree.settings.edgeLabelSize ?? DEFAULT_EDGE_LABEL_SIZE);
   const canvas = $derived(tree.settings.canvas ?? 'cream');
+  const theme = $derived(tree.settings.theme ?? 'warm');
 
   function step(delta: number): void {
     const next = Math.min(MAX, Math.max(MIN, Math.round(size) + delta));
@@ -20,19 +21,35 @@
 <details class="settings">
   <summary title="Tree settings">⚙</summary>
   <div class="menu">
-    <span class="section">Canvas background</span>
-    <div class="canvases" role="group" aria-label="Canvas background">
-      {#each CANVAS_TOKENS as t (t.id)}
-        <button
-          class="canvas-dot"
-          class:active={t.id === canvas}
-          style={`--c: var(--bg-${t.id}-canvas); --d: var(--bg-${t.id}-dot)`}
-          title={t.label}
-          aria-label={`Background ${t.label}`}
-          onclick={() => tree.updateSettings({ canvas: t.id === 'cream' ? undefined : t.id })}
-        ></button>
+    <span class="section">Theme</span>
+    <select
+      class="theme-select"
+      value={theme}
+      onchange={(e) =>
+        tree.updateSettings({
+          theme: e.currentTarget.value === 'warm' ? undefined : e.currentTarget.value,
+        })}
+    >
+      {#each THEMES as t (t.id)}
+        <option value={t.id}>{t.label}</option>
       {/each}
-    </div>
+    </select>
+
+    {#if theme === 'warm'}
+      <span class="section">Canvas background</span>
+      <div class="canvases" role="group" aria-label="Canvas background">
+        {#each CANVAS_TOKENS as t (t.id)}
+          <button
+            class="canvas-dot"
+            class:active={t.id === canvas}
+            style={`--c: var(--bg-${t.id}-canvas); --d: var(--bg-${t.id}-dot)`}
+            title={t.label}
+            aria-label={`Background ${t.label}`}
+            onclick={() => tree.updateSettings({ canvas: t.id === 'cream' ? undefined : t.id })}
+          ></button>
+        {/each}
+      </div>
+    {/if}
 
     <span class="section">Arrow text size (all arrows)</span>
     <div class="stepper">
@@ -87,6 +104,18 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-muted);
+  }
+
+  .theme-select {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-strong);
+    background: var(--surface-canvas);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    padding: 5px 8px;
+    cursor: pointer;
   }
 
   .canvases {

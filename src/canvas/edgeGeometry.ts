@@ -175,10 +175,22 @@ function endpointsOf(edge: FlowEdge, nodes: FlowNode[]): Endpoints | null {
   };
 }
 
+/** A degenerate cubic lying exactly on the from→to chord. */
+function makeStraight(from: Pt, to: Pt): EdgeGeometry {
+  return {
+    p0: from,
+    c1: { x: from.x + (to.x - from.x) / 3, y: from.y + (to.y - from.y) / 3 },
+    c2: { x: from.x + ((to.x - from.x) * 2) / 3, y: from.y + ((to.y - from.y) * 2) / 3 },
+    p3: to,
+  };
+}
+
 /** Full geometry for an edge given the current nodes; null if endpoints are missing. */
 export function computeEdgeGeometry(edge: FlowEdge, nodes: FlowNode[]): EdgeGeometry | null {
   const e = endpointsOf(edge, nodes);
-  return e ? routeCubic(e.from, e.fromSide, e.to, e.toSide, e.obstacles) : null;
+  if (!e) return null;
+  if (edge.data?.straight) return makeStraight(e.from, e.to);
+  return routeCubic(e.from, e.fromSide, e.to, e.toSide, e.obstacles);
 }
 
 // --- crossing-aware routing for fused arrows --------------------------------
@@ -275,6 +287,12 @@ export function computeAllEdgeGeometries(
   for (const e of fused) {
     const ep = endpointsOf(e, nodes);
     if (!ep) continue;
+    if (e.data?.straight) {
+      const g = makeStraight(ep.from, ep.to);
+      map.set(e.id, g);
+      polys.set(e.id, samplePolyline(g));
+      continue;
+    }
     const hostId = fusedInto(e)?.edgeId;
 
     // Arrows that share an endpoint with this one (or ARE its host, or fuse

@@ -19,6 +19,7 @@ export type NodeData = {
 export type EdgeData = {
   kind: EdgeKind;
   label?: string;
+  straight?: boolean;
 };
 
 export type FlowNode = Node<NodeData>;
@@ -84,6 +85,7 @@ export function makeFlowEdge(args: {
   label?: string;
   sourceHandle?: Side | null;
   targetHandle?: Side | null;
+  straight?: boolean;
   /** Fused arrows (into a junction on another arrow) carry no arrowhead. */
   arrowless?: boolean;
 }): FlowEdge {
@@ -96,7 +98,7 @@ export function makeFlowEdge(args: {
     targetHandle: args.targetHandle ?? undefined,
     class: `edge-${args.kind}`,
     style: edgeStyle(args.kind),
-    data: { kind: args.kind, label: args.label },
+    data: { kind: args.kind, label: args.label, straight: args.straight },
     markerEnd: args.arrowless ? undefined : edgeMarker(args.kind),
   };
 }

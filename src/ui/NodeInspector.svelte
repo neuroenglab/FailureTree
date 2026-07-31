@@ -181,6 +181,15 @@
       />
     </label>
 
+    <label class="straight">
+      <input
+        type="checkbox"
+        checked={edge.data?.straight ?? false}
+        onchange={(e) => tree.setEdgeStraight(edge.id, e.currentTarget.checked)}
+      />
+      Straight arrow
+    </label>
+
     <div class="edge-kinds" role="group" aria-label="Arrow meaning">
       {#each EDGE_KINDS as kind (kind)}
         <button
@@ -350,6 +359,21 @@
 
   .swatch.active {
     border-color: var(--ink-strong);
+  }
+
+  .straight {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-strong);
+    cursor: pointer;
+  }
+
+  .straight input {
+    accent-color: var(--swatch-indigo-border);
+    cursor: pointer;
   }
 
   .edge-kinds {
