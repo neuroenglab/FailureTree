@@ -1,14 +1,44 @@
 <script lang="ts">
   import FlowCanvas from './canvas/FlowCanvas.svelte';
+  import NodeInspector from './ui/NodeInspector.svelte';
+  import { tree } from './state/tree.svelte';
+
+  function handleKey(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      return;
+    }
+    if (!(event.ctrlKey || event.metaKey)) return;
+
+    const key = event.key.toLowerCase();
+    if (key === 'z') {
+      event.preventDefault();
+      if (event.shiftKey) tree.redo();
+      else tree.undo();
+    } else if (key === 'y') {
+      event.preventDefault();
+      tree.redo();
+    }
+  }
 </script>
+
+<svelte:window onkeydown={handleKey} />
 
 <div class="app">
   <header class="topbar">
     <span class="logo">🌳</span>
     <h1>FailureTree</h1>
+    <div class="spacer"></div>
+    <button class="history" title="Undo (Ctrl+Z)" disabled={!tree.canUndo} onclick={() => tree.undo()}>
+      ↩
+    </button>
+    <button class="history" title="Redo (Ctrl+Y)" disabled={!tree.canRedo} onclick={() => tree.redo()}>
+      ↪
+    </button>
   </header>
   <main class="canvas-area">
     <FlowCanvas />
+    <NodeInspector />
   </main>
 </div>
 
@@ -41,8 +71,34 @@
     letter-spacing: 0.02em;
   }
 
+  .spacer {
+    flex: 1;
+  }
+
+  .history {
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--ink-strong);
+    background: none;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+
+  .history:hover:not(:disabled) {
+    background: var(--surface-canvas);
+  }
+
+  .history:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
   .canvas-area {
     flex: 1;
     min-height: 0;
+    position: relative;
   }
 </style>

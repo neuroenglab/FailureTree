@@ -30,6 +30,11 @@
     {nodeTypes}
     {onconnect}
     connectionMode={ConnectionMode.Loose}
+    onnodedragstart={() => tree.snapshot()}
+    onbeforedelete={async () => {
+      tree.snapshot();
+      return true;
+    }}
     deleteKey={['Backspace', 'Delete']}
     fitView
   >
