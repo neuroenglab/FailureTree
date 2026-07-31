@@ -6,6 +6,13 @@
   stroke-width: 3.2 !important;
 }
 
+/* The library's EdgeLabel wrapper ships a white background — our own
+   canvas-colored pill (TreeEdgeView) is the only background we want. */
+.svelte-flow__edge-label {
+  background: transparent;
+  --xy-edge-label-background-color: transparent;
+}
+
 .svelte-flow__connection-path {
   stroke: var(--ink-muted);
   stroke-width: 2.2;
