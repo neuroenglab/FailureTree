@@ -1,0 +1,456 @@
+{
+  "id": "2d8d5091-5559-464c-95f1-a0e44d3b27c3",
+  "name": "Disaster Tree v0.1.0",
+  "createdAt": "2026-07-31T00:00:00.000Z",
+  "updatedAt": "2026-07-31T12:10:38.658Z",
+  "schemaVersion": 1,
+  "nodes": [
+    {
+      "id": "i-hd-iemg-3",
+      "kind": "component",
+      "label": "**I** · Does **HD-iEMG (3 cm)** work?",
+      "position": {
+        "x": 0.7462326684794789,
+        "y": 40
+      }
+    },
+    {
+      "id": "i-hd-iemg-2",
+      "kind": "component",
+      "label": "Does **HD-iEMG (2 cm)** work?",
+      "position": {
+        "x": 396.21784463841357,
+        "y": 45.04287381544856
+      }
+    },
+    {
+      "id": "i-hd-semg",
+      "kind": "component",
+      "label": "Does **HD-sEMG** work?",
+      "position": {
+        "x": 740,
+        "y": 41.26071845386214
+      }
+    },
+    {
+      "id": "i-imu",
+      "kind": "component",
+      "label": "Does **IMU** work?\n*(residual movement)*",
+      "position": {
+        "x": 1496,
+        "y": 31.174970822965022
+      }
+    },
+    {
+      "id": "i-none",
+      "kind": "failure",
+      "label": "**NONE**\n*no usable signal source*",
+      "position": {
+        "x": 1957.5643107231724,
+        "y": 32.65353391524076
+      }
+    },
+    {
+      "id": "i-residual",
+      "kind": "action",
+      "label": "Residual movements",
+      "position": {
+        "x": 1486.0075832167956,
+        "y": 863.2720111876141
+      }
+    },
+    {
+      "id": "ii-artifacts",
+      "kind": "experiment",
+      "label": "**II** · Do we see stim artifacts?",
+      "position": {
+        "x": 5.789106483928023,
+        "y": 420
+      }
+    },
+    {
+      "id": "ii-fixed-hz",
+      "kind": "experiment",
+      "label": "At fixed Hz?",
+      "position": {
+        "x": 440,
+        "y": 420
+      }
+    },
+    {
+      "id": "ii-template",
+      "kind": "action",
+      "label": "Template removal",
+      "position": {
+        "x": 446.81776826550754,
+        "y": 618.4073677729481
+      }
+    },
+    {
+      "id": "ii-blanking",
+      "kind": "action",
+      "label": "Blanking",
+      "position": {
+        "x": 648.1867808139093,
+        "y": 678.6309874515983
+      }
+    },
+    {
+      "id": "ii-preproc",
+      "kind": "action",
+      "label": "Classic EMG preproc",
+      "position": {
+        "x": 30.00930463000178,
+        "y": 620.9674417861289
+      }
+    },
+    {
+      "id": "iii-decompose",
+      "kind": "experiment",
+      "label": "**III** · Can we decompose *unique* motor units?",
+      "position": {
+        "x": 0.018609260003557893,
+        "y": 868.7069760751608
+      }
+    },
+    {
+      "id": "iii-mud",
+      "kind": "action",
+      "label": "Motor unit decomposition",
+      "colorToken": "sky",
+      "position": {
+        "x": 11.627910693551257,
+        "y": 1047.7395342890318
+      }
+    },
+    {
+      "id": "iii-controllable",
+      "kind": "experiment",
+      "label": "Controllable?\n*(online)*",
+      "position": {
+        "x": 37.748838919033574,
+        "y": 1222.9023253583869
+      }
+    },
+    {
+      "id": "iii-prop-control",
+      "kind": "action",
+      "label": "Prop. control",
+      "position": {
+        "x": 40.65116427742049,
+        "y": 1402.9023253583869
+      }
+    },
+    {
+      "id": "iii-tonic",
+      "kind": "experiment",
+      "label": "Are they tonic units?",
+      "position": {
+        "x": 414.9571261845515,
+        "y": 1228.825029177035
+      }
+    },
+    {
+      "id": "iii-class-control",
+      "kind": "action",
+      "label": "Class. control",
+      "position": {
+        "x": 420,
+        "y": 1400
+      }
+    },
+    {
+      "id": "iii-cnn-trials",
+      "kind": "experiment",
+      "label": "Do we have enough trials to train a **CNN**?",
+      "position": {
+        "x": 790,
+        "y": 860
+      }
+    },
+    {
+      "id": "iii-ml",
+      "kind": "action",
+      "label": "Machine learning\n*(classical)*",
+      "colorToken": "sky",
+      "position": {
+        "x": 824,
+        "y": 1208
+      }
+    },
+    {
+      "id": "iii-dl",
+      "kind": "action",
+      "label": "Deep learning",
+      "colorToken": "sky",
+      "position": {
+        "x": 1160,
+        "y": 868
+      }
+    },
+    {
+      "id": "iii-prop-control-2",
+      "kind": "action",
+      "label": "Prop. control",
+      "position": {
+        "x": 1160,
+        "y": 1040
+      }
+    },
+    {
+      "id": "iii-go-to-iv",
+      "kind": "note",
+      "label": "Go to **IV**",
+      "position": {
+        "x": 1160,
+        "y": 1178
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e01",
+      "from": "i-hd-iemg-3",
+      "to": "i-hd-iemg-2",
+      "kind": "if-fails",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e02",
+      "from": "i-hd-iemg-2",
+      "to": "i-hd-semg",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e03",
+      "from": "i-hd-semg",
+      "to": "i-imu",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e04",
+      "from": "i-imu",
+      "to": "i-none",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e05",
+      "from": "i-hd-iemg-3",
+      "to": "ii-artifacts",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e06",
+      "from": "i-hd-iemg-2",
+      "to": "ii-artifacts",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "e07",
+      "from": "i-hd-semg",
+      "to": "ii-artifacts",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "e08",
+      "from": "i-imu",
+      "to": "i-residual",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e09",
+      "from": "i-residual",
+      "to": "iii-class-control",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "e10",
+      "from": "ii-artifacts",
+      "to": "ii-fixed-hz",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e11",
+      "from": "ii-artifacts",
+      "to": "ii-preproc",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e12",
+      "from": "ii-fixed-hz",
+      "to": "ii-template",
+      "kind": "mitigated-by",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e13",
+      "from": "ii-fixed-hz",
+      "to": "ii-blanking",
+      "kind": "mitigated-by",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "e14",
+      "from": "ii-template",
+      "to": "ii-preproc",
+      "kind": "leads-to",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "e17",
+      "from": "iii-decompose",
+      "to": "iii-mud",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e18",
+      "from": "iii-decompose",
+      "to": "iii-cnn-trials",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e19",
+      "from": "iii-mud",
+      "to": "iii-controllable",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e20",
+      "from": "iii-controllable",
+      "to": "iii-prop-control",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e21",
+      "from": "iii-controllable",
+      "to": "iii-tonic",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e22",
+      "from": "iii-tonic",
+      "to": "iii-cnn-trials",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "e23",
+      "from": "iii-tonic",
+      "to": "iii-class-control",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e24",
+      "from": "iii-cnn-trials",
+      "to": "iii-dl",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e25",
+      "from": "iii-cnn-trials",
+      "to": "iii-ml",
+      "kind": "if-fails",
+      "label": "no",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e26",
+      "from": "iii-dl",
+      "to": "iii-prop-control-2",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e27",
+      "from": "iii-prop-control-2",
+      "to": "iii-go-to-iv",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "7e5df8a6-bd2a-4e32-93ac-11fbdcab0ef4",
+      "from": "ii-preproc",
+      "to": "iii-decompose",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "82b25ded-c5e0-41b7-ba39-e9d027c4f1fa",
+      "from": "iii-ml",
+      "to": "iii-class-control",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "72bdfc17-3d82-4d76-b191-8d47f0fb993e",
+      "from": "ii-blanking",
+      "to": "ii-preproc",
+      "kind": "leads-to",
+      "fromSide": "left",
+      "toSide": "right"
+    }
+  ]
+}

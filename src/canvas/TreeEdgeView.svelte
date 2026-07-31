@@ -34,7 +34,7 @@
     background: var(--surface-canvas);
     padding: 2px 8px;
     border-radius: 999px;
-    font-size: 0.72rem;
+    font-size: var(--edge-label-size, 0.72rem);
     font-weight: 800;
     max-width: 160px;
     text-align: center;

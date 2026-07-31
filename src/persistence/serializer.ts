@@ -1,4 +1,4 @@
-import { CURRENT_SCHEMA_VERSION, type FailureTree, type Side } from '../domain/types';
+import { CURRENT_SCHEMA_VERSION, type FailureTree, type Side, type TreeSettings } from '../domain/types';
 import { isFailureTree } from '../domain/guards';
 import { makeFlowEdge, makeFlowNode, type FlowEdge, type FlowNode } from '../state/flow';
 
@@ -9,13 +9,19 @@ export interface TreeMeta {
 }
 
 /** Flow working state → pure domain document. */
-export function toDomain(meta: TreeMeta, nodes: FlowNode[], edges: FlowEdge[]): FailureTree {
+export function toDomain(
+  meta: TreeMeta,
+  nodes: FlowNode[],
+  edges: FlowEdge[],
+  settings?: TreeSettings,
+): FailureTree {
   return {
     id: meta.id,
     name: meta.name,
     createdAt: meta.createdAt,
     updatedAt: new Date().toISOString(),
     schemaVersion: CURRENT_SCHEMA_VERSION,
+    settings: settings && Object.keys(settings).length > 0 ? settings : undefined,
     nodes: nodes.map((n) => ({
       id: n.id,
       kind: n.data.kind,

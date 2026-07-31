@@ -1,8 +1,26 @@
 <script lang="ts">
   import FlowCanvas from './canvas/FlowCanvas.svelte';
   import NodeInspector from './ui/NodeInspector.svelte';
+  import SettingsMenu from './ui/SettingsMenu.svelte';
   import TreeSwitcher from './ui/TreeSwitcher.svelte';
   import { tree } from './state/tree.svelte';
+
+  // Apply per-tree presentation settings globally (canvas, edge labels,
+  // and exports all read these custom properties from the root element).
+  $effect(() => {
+    const root = document.documentElement.style;
+    const canvas = tree.settings.canvas;
+    if (canvas) {
+      root.setProperty('--surface-canvas', `var(--bg-${canvas}-canvas)`);
+      root.setProperty('--surface-grid-dot', `var(--bg-${canvas}-dot)`);
+    } else {
+      root.removeProperty('--surface-canvas');
+      root.removeProperty('--surface-grid-dot');
+    }
+    const size = tree.settings.edgeLabelSize;
+    if (size) root.setProperty('--edge-label-size', `${size}px`);
+    else root.removeProperty('--edge-label-size');
+  });
 
   function handleKey(event: KeyboardEvent): void {
     const target = event.target as HTMLElement | null;
@@ -36,6 +54,7 @@
     <span class="logo">🌳</span>
     <h1>FailureTree</h1>
     <TreeSwitcher />
+    <SettingsMenu />
     <div class="spacer"></div>
     <button class="history" title="Undo (Ctrl+Z)" disabled={!tree.canUndo} onclick={() => tree.undo()}>
       ↩

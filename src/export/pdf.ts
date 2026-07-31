@@ -1,3 +1,4 @@
+import type { TreeSettings } from '../domain/types';
 import type { FlowEdge, FlowNode } from '../state/flow';
 import { renderTreeSvg } from './svg';
 import { safeFileName } from './download';
@@ -11,10 +12,11 @@ export async function exportPdf(
   nodes: FlowNode[],
   edges: FlowEdge[],
   treeName: string,
+  settings?: TreeSettings,
 ): Promise<void> {
   const [{ jsPDF }] = await Promise.all([import('jspdf'), import('svg2pdf.js')]);
 
-  const svg = renderTreeSvg(nodes, edges);
+  const svg = renderTreeSvg(nodes, edges, settings);
   const element = new DOMParser().parseFromString(svg, 'image/svg+xml')
     .documentElement as unknown as SVGSVGElement;
   const width = Number(element.getAttribute('width'));

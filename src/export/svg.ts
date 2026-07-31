@@ -3,7 +3,7 @@
  * data — no foreignObject, so the file opens correctly in any SVG viewer
  * (Inkscape, Office, image previews), not just browsers.
  */
-import type { EdgeKind, Side, TextAlign } from '../domain/types';
+import type { EdgeKind, Side, TextAlign, TreeSettings } from '../domain/types';
 import { parseRichText, type Line, type Segment } from '../domain/richtext';
 import { KIND_ALIGN, KIND_COLORS, KIND_LABELS } from '../theme/tokens';
 import type { FlowEdge, FlowNode } from '../state/flow';
@@ -120,7 +120,7 @@ const OUT: Record<Side, { x: number; y: number }> = {
 
 // --- rendering --------------------------------------------------------------
 
-function renderEdge(edge: FlowEdge, boxes: Map<string, Box>, theme: Theme): string {
+function renderEdge(edge: FlowEdge, boxes: Map<string, Box>, theme: Theme, labelSize: number): string {
   const sourceBox = boxes.get(edge.source);
   const targetBox = boxes.get(edge.target);
   if (!sourceBox || !targetBox) return '';
@@ -168,12 +168,12 @@ function renderEdge(edge: FlowEdge, boxes: Map<string, Box>, theme: Theme): stri
       x: (from.x + 3 * c1.x + 3 * c2.x + to.x) / 8,
       y: (from.y + 3 * c1.y + 3 * c2.y + to.y) / 8,
     };
-    const textW = measure({ text: label, bold: true, italic: false }, label, EDGE_LABEL_SIZE);
+    const textW = measure({ text: label, bold: true, italic: false }, label, labelSize);
     const padX = 8;
-    const h = EDGE_LABEL_SIZE + 8;
+    const h = labelSize + 8;
     svg +=
       `<rect x="${r(mid.x - textW / 2 - padX)}" y="${r(mid.y - h / 2)}" width="${r(textW + padX * 2)}" height="${h}" rx="${h / 2}" fill="${theme.surface}"/>` +
-      `<text x="${r(mid.x)}" y="${r(mid.y + EDGE_LABEL_SIZE * 0.34)}" text-anchor="middle" font-family="${FONT_STACK}" font-size="${EDGE_LABEL_SIZE}" font-weight="800" fill="${color}">${esc(label)}</text>`;
+      `<text x="${r(mid.x)}" y="${r(mid.y + labelSize * 0.34)}" text-anchor="middle" font-family="${FONT_STACK}" font-size="${labelSize}" font-weight="800" fill="${color}">${esc(label)}</text>`;
   }
   return svg;
 }
@@ -226,9 +226,14 @@ function renderNode(node: FlowNode, theme: Theme): string {
   );
 }
 
-export function renderTreeSvg(nodes: FlowNode[], edges: FlowEdge[]): string {
+export function renderTreeSvg(
+  nodes: FlowNode[],
+  edges: FlowEdge[],
+  settings?: TreeSettings,
+): string {
   if (nodes.length === 0) throw new Error('Nothing to export — the tree is empty.');
   const theme = readTheme();
+  const labelSize = settings?.edgeLabelSize ?? EDGE_LABEL_SIZE;
 
   const boxes = new Map(nodes.map((n) => [n.id, nodeBox(n)]));
   const all = [...boxes.values()];
@@ -242,13 +247,18 @@ export function renderTreeSvg(nodes: FlowNode[], edges: FlowEdge[]): string {
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${minX} ${minY} ${width} ${height}">` +
     `<rect x="${minX}" y="${minY}" width="${width}" height="${height}" fill="${theme.surface}"/>` +
-    edges.map((e) => renderEdge(e, boxes, theme)).join('') +
+    edges.map((e) => renderEdge(e, boxes, theme, labelSize)).join('') +
     nodes.map((n) => renderNode(n, theme)).join('') +
     `</svg>`
   );
 }
 
-export function exportSvg(nodes: FlowNode[], edges: FlowEdge[], treeName: string): void {
-  const svg = renderTreeSvg(nodes, edges);
+export function exportSvg(
+  nodes: FlowNode[],
+  edges: FlowEdge[],
+  treeName: string,
+  settings?: TreeSettings,
+): void {
+  const svg = renderTreeSvg(nodes, edges, settings);
   downloadBlob(new Blob([svg], { type: 'image/svg+xml' }), `${safeFileName(treeName)}.svg`);
 }

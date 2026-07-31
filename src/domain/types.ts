@@ -48,11 +48,20 @@ export interface TreeEdge {
   toSide?: Side;
 }
 
+/** Per-tree presentation settings (travel with the document). */
+export interface TreeSettings {
+  /** Font size for ALL arrow labels, in px; unset means the default (11.5). */
+  edgeLabelSize?: number;
+  /** Canvas background token; unset means the default warm cream. */
+  canvas?: string;
+}
+
 export interface FailureTree {
   id: string;
   name: string;
   nodes: TreeNode[];
   edges: TreeEdge[];
+  settings?: TreeSettings;
   createdAt: string;
   updatedAt: string;
   schemaVersion: number;

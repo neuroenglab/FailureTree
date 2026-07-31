@@ -1,5 +1,5 @@
 import type { Connection } from '@xyflow/svelte';
-import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side, TextAlign } from '../domain/types';
+import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side, TextAlign, TreeSettings } from '../domain/types';
 import { defaultEdgeKind } from '../domain/graph';
 import { KIND_LABELS } from '../theme/tokens';
 import { edgeMarker, edgeStyle, makeFlowEdge, makeFlowNode, type EdgeData, type FlowEdge, type FlowNode, type NodeData } from './flow';
@@ -23,6 +23,7 @@ class TreeStore {
   treeId = $state('');
   treeName = $state('');
   treeList = $state.raw<storage.TreeListing[]>([]);
+  settings = $state.raw<TreeSettings>({});
 
   private createdAt = '';
   private undoStack = $state.raw<Snapshot[]>([]);
@@ -103,11 +104,17 @@ class TreeStore {
     this.scheduleSave();
   }
 
+  updateSettings(patch: TreeSettings): void {
+    this.settings = { ...this.settings, ...patch };
+    this.scheduleSave();
+  }
+
   toDocument(): FailureTree {
     return toDomain(
       { id: this.treeId, name: this.treeName, createdAt: this.createdAt },
       this.nodes,
       this.edges,
+      this.settings,
     );
   }
 
@@ -115,6 +122,7 @@ class TreeStore {
     const { nodes, edges } = fromDomain(doc);
     this.treeId = doc.id;
     this.treeName = doc.name;
+    this.settings = doc.settings ?? {};
     this.createdAt = doc.createdAt;
     this.nodes = nodes;
     this.edges = edges;

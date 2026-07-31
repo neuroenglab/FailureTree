@@ -15,6 +15,20 @@
   --shadow-soft: 0 2px 10px rgba(90, 70, 50, 0.1);
   --shadow-lifted: 0 6px 24px rgba(90, 70, 50, 0.16);
 
+  /* Canvas background choices (picked per tree in Settings) */
+  --bg-cream-canvas: #faf6ef;
+  --bg-cream-dot: #e0d7c8;
+  --bg-snow-canvas: #fbfbfa;
+  --bg-snow-dot: #e2e2df;
+  --bg-blush-canvas: #faf1ee;
+  --bg-blush-dot: #e8d5cd;
+  --bg-mint-canvas: #f1f7f0;
+  --bg-mint-dot: #d4e3d2;
+  --bg-sky-canvas: #eff5f8;
+  --bg-sky-dot: #d3e2e9;
+  --bg-stone-canvas: #f2f1ef;
+  --bg-stone-dot: #dcd9d4;
+
   /* App surfaces — warm cream */
   --surface-canvas: #faf6ef;
   --surface-panel: #fffdf8;
@@ -66,6 +80,19 @@
   :root {
     --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
     --shadow-lifted: 0 6px 24px rgba(0, 0, 0, 0.45);
+
+    --bg-cream-canvas: #26221c;
+    --bg-cream-dot: #3d382f;
+    --bg-snow-canvas: #232323;
+    --bg-snow-dot: #3a3a3a;
+    --bg-blush-canvas: #2a2220;
+    --bg-blush-dot: #443733;
+    --bg-mint-canvas: #212822;
+    --bg-mint-dot: #37453a;
+    --bg-sky-canvas: #1f262b;
+    --bg-sky-dot: #364550;
+    --bg-stone-canvas: #242628;
+    --bg-stone-dot: #3c3e42;
 
     --surface-canvas: #26221c;
     --surface-panel: #2e2a23;

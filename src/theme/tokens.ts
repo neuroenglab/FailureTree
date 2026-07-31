@@ -44,6 +44,16 @@ export const EDGE_LABELS: Record<EdgeKind, string> = {
   'mitigated-by': 'mitigated by',
 };
 
+/** Canvas background choices; colors live in global.css as --bg-<id>-canvas/-dot. */
+export const CANVAS_TOKENS = [
+  { id: 'cream', label: 'Cream' },
+  { id: 'snow', label: 'Snow' },
+  { id: 'blush', label: 'Blush' },
+  { id: 'mint', label: 'Mint' },
+  { id: 'sky', label: 'Sky' },
+  { id: 'stone', label: 'Stone' },
+] as const;
+
 /** CSS custom property helpers, e.g. swatchVar('sage', 'bg') → var(--swatch-sage-bg) */
 export function swatchVar(token: ColorToken, part: 'bg' | 'border' | 'ink'): string {
   return `var(--swatch-${token}-${part})`;
