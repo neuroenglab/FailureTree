@@ -3,79 +3,37 @@ import type { FlowNode } from '../state/flow';
 import { downloadUrl, safeFileName } from './download';
 
 const PADDING = 48;
-const MIN_ZOOM = 0.4;
-const MAX_ZOOM = 2;
+const MAX_CANVAS_EDGE = 8192;
 
-interface Frame {
-  el: HTMLElement;
-  width: number;
-  height: number;
-  transform: string;
-  background: string;
-}
-
-/** Frame the flow viewport around all nodes, ready for capture. */
-function frameViewport(nodes: FlowNode[]): Frame {
+/**
+ * PNG is a faithful raster screenshot of the live canvas (html-to-image),
+ * captured at 1:1 zoom regardless of the current viewport, at 2x pixel
+ * density (reduced only if a huge tree would exceed canvas size limits).
+ */
+export async function exportPng(nodes: FlowNode[], treeName: string): Promise<void> {
   const el = document.querySelector<HTMLElement>('.svelte-flow__viewport');
   if (!el) throw new Error('Canvas not found.');
   if (nodes.length === 0) throw new Error('Nothing to export — the tree is empty.');
 
   const bounds = getNodesBounds(nodes);
-  const width = Math.max(320, Math.ceil(bounds.width) + PADDING * 2);
-  const height = Math.max(320, Math.ceil(bounds.height) + PADDING * 2);
-  const viewport = getViewportForBounds(bounds, width, height, MIN_ZOOM, MAX_ZOOM, PADDING);
-  const background = getComputedStyle(document.documentElement)
-    .getPropertyValue('--surface-canvas')
-    .trim();
+  const width = Math.ceil(bounds.width) + PADDING * 2;
+  const height = Math.ceil(bounds.height) + PADDING * 2;
+  const viewport = getViewportForBounds(bounds, width, height, 1, 1, 0);
+  const pixelRatio = Math.min(2, MAX_CANVAS_EDGE / Math.max(width, height));
 
-  return {
-    el,
+  const { toPng } = await import('html-to-image');
+  const dataUrl = await toPng(el, {
+    backgroundColor: getComputedStyle(document.documentElement)
+      .getPropertyValue('--surface-canvas')
+      .trim(),
     width,
     height,
-    transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
-    background,
-  };
-}
-
-function captureOptions(frame: Frame) {
-  return {
-    backgroundColor: frame.background,
-    width: frame.width,
-    height: frame.height,
-    pixelRatio: 2,
+    pixelRatio,
     style: {
-      width: `${frame.width}px`,
-      height: `${frame.height}px`,
-      transform: frame.transform,
+      width: `${width}px`,
+      height: `${height}px`,
+      transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
     },
-  };
-}
-
-export async function exportPng(nodes: FlowNode[], treeName: string): Promise<void> {
-  const { toPng } = await import('html-to-image');
-  const frame = frameViewport(nodes);
-  const dataUrl = await toPng(frame.el, captureOptions(frame));
-  downloadUrl(dataUrl, `${safeFileName(treeName)}.png`);
-}
-
-export async function exportSvg(nodes: FlowNode[], treeName: string): Promise<void> {
-  const { toSvg } = await import('html-to-image');
-  const frame = frameViewport(nodes);
-  const dataUrl = await toSvg(frame.el, captureOptions(frame));
-  downloadUrl(dataUrl, `${safeFileName(treeName)}.svg`);
-}
-
-export async function exportPdf(nodes: FlowNode[], treeName: string): Promise<void> {
-  const [{ toPng }, { jsPDF }] = await Promise.all([import('html-to-image'), import('jspdf')]);
-  const frame = frameViewport(nodes);
-  const dataUrl = await toPng(frame.el, captureOptions(frame));
-
-  const pdf = new jsPDF({
-    orientation: frame.width > frame.height ? 'landscape' : 'portrait',
-    unit: 'px',
-    format: [frame.width, frame.height],
-    hotfixes: ['px_scaling'],
   });
-  pdf.addImage(dataUrl, 'PNG', 0, 0, frame.width, frame.height);
-  pdf.save(`${safeFileName(treeName)}.pdf`);
+  downloadUrl(dataUrl, `${safeFileName(treeName)}.png`);
 }

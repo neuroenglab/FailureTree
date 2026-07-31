@@ -20,6 +20,7 @@
   "dependencies": {
     "@xyflow/svelte": "^1.6.2",
     "html-to-image": "^1.11.13",
-    "jspdf": "^4.2.1"
+    "jspdf": "^4.2.1",
+    "svg2pdf.js": "^2.7.0"
   }
 }

@@ -1,7 +1,9 @@
 <script lang="ts">
   import { tree } from '../state/tree.svelte';
   import { downloadJson, readJsonFile } from '../export/json';
-  import { exportPdf, exportPng, exportSvg } from '../export/image';
+  import { exportPng } from '../export/image';
+  import { exportSvg } from '../export/svg';
+  import { exportPdf } from '../export/pdf';
 
   let fileInput: HTMLInputElement;
   let exportMenu: HTMLDetailsElement;
@@ -64,8 +66,8 @@
     <div class="menu">
       <button onclick={() => runExport(() => downloadJson(tree.toDocument()))}>JSON (re-importable)</button>
       <button onclick={() => runExport(() => exportPng(tree.nodes, tree.treeName))}>PNG image</button>
-      <button onclick={() => runExport(() => exportSvg(tree.nodes, tree.treeName))}>SVG image</button>
-      <button onclick={() => runExport(() => exportPdf(tree.nodes, tree.treeName))}>PDF</button>
+      <button onclick={() => runExport(() => exportSvg(tree.nodes, tree.edges, tree.treeName))}>SVG image</button>
+      <button onclick={() => runExport(() => exportPdf(tree.nodes, tree.edges, tree.treeName))}>PDF</button>
     </div>
   </details>
   <button title="Import a JSON tree" onclick={() => fileInput.click()}>Import</button>
