@@ -2,32 +2,37 @@
  * True-vector SVG export: real rects, text, and paths built from the tree
  * data — no foreignObject, so the file opens correctly in any SVG viewer
  * (Inkscape, Office, image previews), not just browsers.
+ *
+ * All curve geometry comes from canvas/edgeGeometry, so exported arrows
+ * follow exactly the same routed paths as the ones on screen.
  */
-import type { EdgeKind, Side, TextAlign, TreeSettings } from '../domain/types';
+import type { EdgeKind, TextAlign, TreeSettings } from '../domain/types';
 import { parseRichText, type Line, type Segment } from '../domain/richtext';
 import { KIND_ALIGN, KIND_COLORS, KIND_LABELS } from '../theme/tokens';
 import type { FlowEdge, FlowNode } from '../state/flow';
+import {
+  boxCenter,
+  computeEdgeGeometry,
+  cubicPoint,
+  isJunction,
+  nodeBox,
+  pathString,
+  type Box,
+  type EdgeGeometry,
+  type Pt,
+} from '../canvas/edgeGeometry';
 import { downloadBlob, safeFileName } from './download';
 
 const PAD = 48;
 const NODE_PAD_X = 16;
-const FALLBACK_NODE = { width: 170, height: 58 };
 const TAG_SIZE = 9.6;
 const DEFAULT_LABEL_SIZE = 14.4;
 const EDGE_LABEL_SIZE = 11.5;
 const FONT_STACK = 'Nunito, Segoe UI, sans-serif';
 const ARROW = 9;
 
-interface Box {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
 interface Theme {
   surface: string;
-  gridDot: string;
   swatch: (token: string, part: 'bg' | 'border' | 'ink') => string;
   edge: (kind: EdgeKind) => string;
 }
@@ -37,7 +42,6 @@ function readTheme(): Theme {
   const v = (name: string) => style.getPropertyValue(name).trim();
   return {
     surface: v('--surface-canvas'),
-    gridDot: v('--surface-grid-dot'),
     swatch: (token, part) => v(`--swatch-${token}-${part}`),
     edge: (kind) => v(`--edge-${kind}`),
   };
@@ -46,6 +50,8 @@ function readTheme(): Theme {
 function esc(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+
+const r = (n: number) => Math.round(n * 100) / 100;
 
 // --- text measurement & wrapping -------------------------------------------
 
@@ -93,81 +99,56 @@ function lineToTspans(line: Line): string {
     .join('');
 }
 
-// --- geometry ---------------------------------------------------------------
+// --- edges ------------------------------------------------------------------
 
-function nodeBox(node: FlowNode): Box {
-  return {
-    x: node.position.x,
-    y: node.position.y,
-    width: node.measured?.width ?? FALLBACK_NODE.width,
-    height: node.measured?.height ?? FALLBACK_NODE.height,
-  };
+function edgeDash(kind: EdgeKind): string {
+  if (kind === 'if-fails') return ' stroke-dasharray="8 5"';
+  if (kind === 'mitigated-by') return ' stroke-dasharray="2 6" stroke-linecap="round"';
+  return '';
 }
 
-function anchor(box: Box, side: Side): { x: number; y: number } {
-  if (side === 'top') return { x: box.x + box.width / 2, y: box.y };
-  if (side === 'bottom') return { x: box.x + box.width / 2, y: box.y + box.height };
-  if (side === 'left') return { x: box.x, y: box.y + box.height / 2 };
-  return { x: box.x + box.width, y: box.y + box.height / 2 };
-}
-
-const OUT: Record<Side, { x: number; y: number }> = {
-  top: { x: 0, y: -1 },
-  bottom: { x: 0, y: 1 },
-  left: { x: -1, y: 0 },
-  right: { x: 1, y: 0 },
-};
-
-// --- rendering --------------------------------------------------------------
-
-function renderEdge(edge: FlowEdge, boxes: Map<string, Box>, theme: Theme, labelSize: number): string {
-  const sourceBox = boxes.get(edge.source);
-  const targetBox = boxes.get(edge.target);
-  if (!sourceBox || !targetBox) return '';
+function renderEdge(edge: FlowEdge, nodes: FlowNode[], theme: Theme, labelSize: number): string {
+  const g = computeEdgeGeometry(edge, nodes);
+  if (!g) return '';
+  const target = nodes.find((n) => n.id === edge.target);
+  const fuseIntoEdge = target ? isJunction(target) : false;
 
   const kind = edge.data?.kind ?? 'leads-to';
-  const fromSide = (edge.sourceHandle as Side | null | undefined) ?? 'bottom';
-  const toSide = (edge.targetHandle as Side | null | undefined) ?? 'top';
-  const from = anchor(sourceBox, fromSide);
-  const to = anchor(targetBox, toSide);
-
-  const dist = Math.hypot(to.x - from.x, to.y - from.y);
-  const bend = Math.min(200, Math.max(40, dist * 0.35));
-  const c1 = { x: from.x + OUT[fromSide].x * bend, y: from.y + OUT[fromSide].y * bend };
-  const c2 = { x: to.x + OUT[toSide].x * bend, y: to.y + OUT[toSide].y * bend };
-
-  // End the line a touch early and draw the arrowhead as an explicit polygon —
-  // marker support is spotty in non-browser viewers and svg2pdf.
-  const inDir = { x: -OUT[toSide].x, y: -OUT[toSide].y };
-  const lineEnd = { x: to.x - inDir.x * (ARROW - 2), y: to.y - inDir.y * (ARROW - 2) };
-  const left = {
-    x: to.x - inDir.x * ARROW - inDir.y * (ARROW * 0.45),
-    y: to.y - inDir.y * ARROW + inDir.x * (ARROW * 0.45),
-  };
-  const right = {
-    x: to.x - inDir.x * ARROW + inDir.y * (ARROW * 0.45),
-    y: to.y - inDir.y * ARROW - inDir.x * (ARROW * 0.45),
-  };
-
   const color = theme.edge(kind);
-  const dash =
-    kind === 'if-fails' ? ' stroke-dasharray="8 5"' :
-    kind === 'mitigated-by' ? ' stroke-dasharray="2 6" stroke-linecap="round"' : '';
 
-  const r = (n: number) => Math.round(n * 100) / 100;
-  let svg =
-    `<path d="M ${r(from.x)} ${r(from.y)} C ${r(c1.x)} ${r(c1.y)}, ${r(c2.x)} ${r(c2.y)}, ${r(lineEnd.x)} ${r(lineEnd.y)}" ` +
-    `fill="none" stroke="${color}" stroke-width="2.2"${dash}/>` +
-    `<path d="M ${r(to.x)} ${r(to.y)} L ${r(left.x)} ${r(left.y)} L ${r(right.x)} ${r(right.y)} Z" fill="${color}"/>`;
+  let svg = '';
+  if (fuseIntoEdge) {
+    // Fused arrow: runs all the way to the junction dot, no arrowhead.
+    svg += `<path d="${pathString(g)}" fill="none" stroke="${color}" stroke-width="2.2"${edgeDash(kind)}/>`;
+  } else {
+    // End the line a touch early and draw the arrowhead as an explicit
+    // polygon aligned to the end tangent — marker support is spotty in
+    // non-browser viewers and svg2pdf.
+    let dir: Pt = { x: g.p3.x - g.c2.x, y: g.p3.y - g.c2.y };
+    const len = Math.hypot(dir.x, dir.y) || 1;
+    dir = { x: dir.x / len, y: dir.y / len };
+    const shortened: EdgeGeometry = {
+      ...g,
+      p3: { x: g.p3.x - dir.x * (ARROW - 2), y: g.p3.y - dir.y * (ARROW - 2) },
+    };
+    const left = {
+      x: g.p3.x - dir.x * ARROW - dir.y * (ARROW * 0.45),
+      y: g.p3.y - dir.y * ARROW + dir.x * (ARROW * 0.45),
+    };
+    const right = {
+      x: g.p3.x - dir.x * ARROW + dir.y * (ARROW * 0.45),
+      y: g.p3.y - dir.y * ARROW - dir.x * (ARROW * 0.45),
+    };
+    svg +=
+      `<path d="${pathString(shortened)}" fill="none" stroke="${color}" stroke-width="2.2"${edgeDash(kind)}/>` +
+      `<path d="M ${r(g.p3.x)} ${r(g.p3.y)} L ${r(left.x)} ${r(left.y)} L ${r(right.x)} ${r(right.y)} Z" fill="${color}"/>`;
+  }
 
   const label = edge.data?.label;
   if (label) {
-    // Cubic bezier midpoint; a canvas-colored pill behind the text makes the
-    // arrow appear to break around it — same effect as on screen.
-    const mid = {
-      x: (from.x + 3 * c1.x + 3 * c2.x + to.x) / 8,
-      y: (from.y + 3 * c1.y + 3 * c2.y + to.y) / 8,
-    };
+    // Canvas-colored pill behind the text: the arrow appears to break
+    // around it — same effect as on screen.
+    const mid = cubicPoint(g, 0.5);
     const textW = measure({ text: label, bold: true, italic: false }, label, labelSize);
     const padX = 8;
     const h = labelSize + 8;
@@ -178,12 +159,21 @@ function renderEdge(edge: FlowEdge, boxes: Map<string, Box>, theme: Theme, label
   return svg;
 }
 
+// --- nodes ------------------------------------------------------------------
+
 function nodeRadius(node: FlowNode, box: Box): number {
   const kind = node.data.kind;
   if (kind === 'action') return box.height / 2;
   if (kind === 'experiment') return 18;
   if (kind === 'failure') return 4;
   return 8;
+}
+
+function renderJunction(node: FlowNode, edges: FlowEdge[], theme: Theme): string {
+  const host = edges.find((e) => e.id === node.data.junction?.edgeId);
+  const color = theme.edge(host?.data?.kind ?? 'leads-to');
+  const c = boxCenter(nodeBox(node));
+  return `<circle cx="${r(c.x)}" cy="${r(c.y)}" r="4" fill="${color}"/>`;
 }
 
 function renderNode(node: FlowNode, theme: Theme): string {
@@ -226,6 +216,8 @@ function renderNode(node: FlowNode, theme: Theme): string {
   );
 }
 
+// --- document ---------------------------------------------------------------
+
 export function renderTreeSvg(
   nodes: FlowNode[],
   edges: FlowEdge[],
@@ -235,20 +227,21 @@ export function renderTreeSvg(
   const theme = readTheme();
   const labelSize = settings?.edgeLabelSize ?? EDGE_LABEL_SIZE;
 
-  const boxes = new Map(nodes.map((n) => [n.id, nodeBox(n)]));
-  const all = [...boxes.values()];
-  const minX = Math.min(...all.map((b) => b.x)) - PAD;
-  const minY = Math.min(...all.map((b) => b.y)) - PAD;
-  const maxX = Math.max(...all.map((b) => b.x + b.width)) + PAD;
-  const maxY = Math.max(...all.map((b) => b.y + b.height)) + PAD;
+  const boxes = nodes.map(nodeBox);
+  const minX = Math.min(...boxes.map((b) => b.x)) - PAD;
+  const minY = Math.min(...boxes.map((b) => b.y)) - PAD;
+  const maxX = Math.max(...boxes.map((b) => b.x + b.width)) + PAD;
+  const maxY = Math.max(...boxes.map((b) => b.y + b.height)) + PAD;
   const width = Math.round(maxX - minX);
   const height = Math.round(maxY - minY);
 
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${minX} ${minY} ${width} ${height}">` +
     `<rect x="${minX}" y="${minY}" width="${width}" height="${height}" fill="${theme.surface}"/>` +
-    edges.map((e) => renderEdge(e, boxes, theme, labelSize)).join('') +
-    nodes.map((n) => renderNode(n, theme)).join('') +
+    edges.map((e) => renderEdge(e, nodes, theme, labelSize)).join('') +
+    nodes
+      .map((n) => (isJunction(n) ? renderJunction(n, edges, theme) : renderNode(n, theme)))
+      .join('') +
     `</svg>`
   );
 }

@@ -12,6 +12,8 @@ export type NodeData = {
   colorToken?: ColorToken;
   align?: TextAlign;
   fontSize?: number;
+  /** Junction nodes only: which edge this dot sits on, and where along it. */
+  junction?: { edgeId: string; t: number };
 };
 
 export type EdgeData = {

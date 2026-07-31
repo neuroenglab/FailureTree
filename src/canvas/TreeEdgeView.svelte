@@ -1,31 +1,27 @@
 <script lang="ts">
-  import { BaseEdge, EdgeLabel, getBezierPath, type EdgeProps } from '@xyflow/svelte';
+  import { BaseEdge, EdgeLabel, type EdgeProps } from '@xyflow/svelte';
   import type { FlowEdge } from '../state/flow';
+  import { tree } from '../state/tree.svelte';
+  import { computeEdgeGeometry, cubicPoint, pathString } from './edgeGeometry';
 
-  let {
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition,
-    targetPosition,
-    markerEnd,
-    style,
-    data,
-  }: EdgeProps<FlowEdge> = $props();
+  let { id, markerEnd, style, data }: EdgeProps<FlowEdge> = $props();
 
-  const path = $derived(
-    getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition }),
-  );
+  const geo = $derived.by(() => {
+    const edge = tree.edges.find((e) => e.id === id);
+    return edge ? computeEdgeGeometry(edge, tree.nodes) : null;
+  });
+  const mid = $derived(geo ? cubicPoint(geo, 0.5) : null);
 </script>
 
-<BaseEdge path={path[0]} {markerEnd} {style} />
+{#if geo}
+  <BaseEdge path={pathString(geo)} {markerEnd} {style} />
 
-{#if data?.label}
-  <!-- Canvas-colored pill: the arrow appears to break around the text. -->
-  <EdgeLabel x={path[1]} y={path[2]}>
-    <span class="edge-label" style={`color: var(--edge-${data.kind})`}>{data.label}</span>
-  </EdgeLabel>
+  {#if data?.label && mid}
+    <!-- Canvas-colored pill: the arrow appears to break around the text. -->
+    <EdgeLabel x={mid.x} y={mid.y}>
+      <span class="edge-label" style={`color: var(--edge-${data.kind})`}>{data.label}</span>
+    </EdgeLabel>
+  {/if}
 {/if}
 
 <style>

@@ -19,6 +19,7 @@ export const KIND_COLORS: Record<NodeKind, ColorToken> = {
   failure: 'terracotta',
   action: 'sage',
   note: 'butter',
+  junction: 'sand',
 };
 
 export const KIND_LABELS: Record<NodeKind, string> = {
@@ -27,6 +28,7 @@ export const KIND_LABELS: Record<NodeKind, string> = {
   failure: 'Failure mode',
   action: 'Action',
   note: 'Note',
+  junction: 'Junction',
 };
 
 /** Default label alignment per node kind (overridable per node). */
@@ -36,6 +38,7 @@ export const KIND_ALIGN: Record<NodeKind, TextAlign> = {
   failure: 'left',
   action: 'center',
   note: 'left',
+  junction: 'center',
 };
 
 export const EDGE_LABELS: Record<EdgeKind, string> = {

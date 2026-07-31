@@ -1,6 +1,6 @@
 import type { FailureTree } from './types';
 
-const NODE_KINDS = new Set(['experiment', 'component', 'failure', 'action', 'note']);
+const NODE_KINDS = new Set(['experiment', 'component', 'failure', 'action', 'note', 'junction']);
 const EDGE_KINDS = new Set(['leads-to', 'if-fails', 'mitigated-by']);
 
 /** Structural check for data loaded from storage or an imported file. */

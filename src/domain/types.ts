@@ -1,6 +1,7 @@
 // Pure domain model — no Svelte, no DOM, no library imports.
 
-export type NodeKind = 'experiment' | 'component' | 'failure' | 'action' | 'note';
+/** 'junction' is a special dot-node that fuses an arrow into another arrow. */
+export type NodeKind = 'experiment' | 'component' | 'failure' | 'action' | 'note' | 'junction';
 
 export type EdgeKind = 'leads-to' | 'if-fails' | 'mitigated-by';
 
@@ -29,6 +30,8 @@ export interface TreeNode {
   fontSize?: number;
   /** Explicit size once the node has been manually resized. */
   size?: { width: number; height: number };
+  /** Junction nodes only: which edge this dot sits on, and where along it. */
+  junction?: { edgeId: string; t: number };
   position: { x: number; y: number };
 }
 
