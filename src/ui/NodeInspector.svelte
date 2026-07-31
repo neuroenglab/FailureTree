@@ -1,28 +1,50 @@
 <script lang="ts">
-  import type { EdgeKind } from '../domain/types';
-  import { COLOR_TOKENS, EDGE_LABELS, KIND_COLORS, KIND_LABELS } from '../theme/tokens';
+  import type { EdgeKind, TextAlign } from '../domain/types';
+  import { COLOR_TOKENS, EDGE_LABELS, KIND_ALIGN, KIND_COLORS, KIND_LABELS } from '../theme/tokens';
   import { tree } from '../state/tree.svelte';
 
   const node = $derived(tree.selectedNode);
   const edge = $derived(tree.selectedEdge);
 
   const EDGE_KINDS: EdgeKind[] = ['leads-to', 'if-fails', 'mitigated-by'];
+  const ALIGNS: { value: TextAlign; icon: string; title: string }[] = [
+    { value: 'left', icon: '⯇', title: 'Align left' },
+    { value: 'center', icon: '☰', title: 'Align center' },
+    { value: 'right', icon: '⯈', title: 'Align right' },
+  ];
 </script>
 
 {#if node}
   {@const activeToken = node.data.colorToken ?? KIND_COLORS[node.data.kind]}
+  {@const activeAlign = node.data.align ?? KIND_ALIGN[node.data.kind]}
   <aside class="inspector">
     <span class="kind-tag">{KIND_LABELS[node.data.kind]}</span>
 
     <label>
       Label
-      <input
-        type="text"
+      <textarea
+        rows="2"
         value={node.data.label}
         onfocus={() => tree.snapshot()}
         oninput={(e) => tree.updateNodeData(node.id, { label: e.currentTarget.value })}
-      />
+      ></textarea>
     </label>
+    <p class="hint">Enter for a new line · **bold** · *italic*</p>
+
+    <div class="aligns" role="group" aria-label="Label alignment">
+      {#each ALIGNS as a (a.value)}
+        <button
+          class="align"
+          class:active={a.value === activeAlign}
+          title={a.title}
+          aria-pressed={a.value === activeAlign}
+          onclick={() =>
+            tree.setNodeAlign(node.id, a.value === KIND_ALIGN[node.data.kind] ? undefined : a.value)}
+        >
+          {a.icon}
+        </button>
+      {/each}
+    </div>
 
     <label>
       Notes
@@ -107,7 +129,6 @@
     color: var(--ink-muted);
   }
 
-  input,
   textarea {
     font-family: var(--font-body);
     font-size: 0.88rem;
@@ -120,10 +141,38 @@
     resize: vertical;
   }
 
-  input:focus,
   textarea:focus {
     outline: 2px solid var(--swatch-indigo-border);
     outline-offset: 1px;
+  }
+
+  .hint {
+    margin: -6px 0 0;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--ink-muted);
+  }
+
+  .aligns {
+    display: flex;
+    gap: 4px;
+  }
+
+  .align {
+    flex: 1;
+    font-size: 0.85rem;
+    line-height: 1;
+    color: var(--ink-strong);
+    background: var(--surface-canvas);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    padding: 5px 0;
+    cursor: pointer;
+  }
+
+  .align.active {
+    border-color: var(--swatch-indigo-border);
+    background: var(--swatch-indigo-bg);
   }
 
   .swatches {

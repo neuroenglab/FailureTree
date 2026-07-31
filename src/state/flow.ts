@@ -1,5 +1,5 @@
 import { MarkerType, type Edge, type Node } from '@xyflow/svelte';
-import type { ColorToken, EdgeKind, NodeKind, Side } from '../domain/types';
+import type { ColorToken, EdgeKind, NodeKind, Side, TextAlign } from '../domain/types';
 
 /**
  * Working state lives in Svelte Flow's node/edge shape, with our domain
@@ -10,6 +10,7 @@ export type NodeData = {
   label: string;
   notes: string;
   colorToken?: ColorToken;
+  align?: TextAlign;
 };
 
 export type EdgeData = {
@@ -45,6 +46,7 @@ export function makeFlowNode(args: {
   label: string;
   notes?: string;
   colorToken?: ColorToken;
+  align?: TextAlign;
   position: { x: number; y: number };
 }): FlowNode {
   return {
@@ -56,6 +58,7 @@ export function makeFlowNode(args: {
       label: args.label,
       notes: args.notes ?? '',
       colorToken: args.colorToken,
+      align: args.align,
     },
   };
 }

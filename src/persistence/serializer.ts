@@ -22,6 +22,7 @@ export function toDomain(meta: TreeMeta, nodes: FlowNode[], edges: FlowEdge[]): 
       label: n.data.label,
       notes: n.data.notes || undefined,
       colorToken: n.data.colorToken,
+      align: n.data.align,
       position: { x: n.position.x, y: n.position.y },
     })),
     edges: edges.map((e) => ({
@@ -45,6 +46,7 @@ export function fromDomain(doc: FailureTree): { nodes: FlowNode[]; edges: FlowEd
         label: n.label,
         notes: n.notes,
         colorToken: n.colorToken,
+        align: n.align,
         position: n.position,
       }),
     ),

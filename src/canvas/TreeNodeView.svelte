@@ -1,11 +1,14 @@
 <script lang="ts">
   import { Handle, Position, type NodeProps } from '@xyflow/svelte';
   import type { FlowNode } from '../state/tree.svelte';
-  import { KIND_COLORS, KIND_LABELS } from '../theme/tokens';
+  import { parseRichText } from '../domain/richtext';
+  import { KIND_ALIGN, KIND_COLORS, KIND_LABELS } from '../theme/tokens';
 
   let { data, selected }: NodeProps<FlowNode> = $props();
 
   const token = $derived(data.colorToken ?? KIND_COLORS[data.kind]);
+  const align = $derived(data.align ?? KIND_ALIGN[data.kind]);
+  const lines = $derived(parseRichText(data.label));
 </script>
 
 <div
@@ -19,7 +22,14 @@
   style={`--n-bg: var(--swatch-${token}-bg); --n-border: var(--swatch-${token}-border); --n-ink: var(--swatch-${token}-ink);`}
 >
   <span class="kind-tag">{KIND_LABELS[data.kind]}</span>
-  <div class="label">{data.label}</div>
+  <div class="label" style:text-align={align}>
+    {#each lines as line, i (i)}
+      {#if i > 0}<br />{/if}
+      {#each line as seg, j (j)}
+        <span class:b={seg.bold} class:i={seg.italic}>{seg.text}</span>
+      {/each}
+    {/each}
+  </div>
   <!-- Loose connection mode: every handle can start or receive an arrow. -->
   <Handle id="top" type="source" position={Position.Top} />
   <Handle id="right" type="source" position={Position.Right} />
@@ -67,9 +77,17 @@
 
   .label {
     font-size: 0.9rem;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.25;
     overflow-wrap: break-word;
+  }
+
+  .label .b {
+    font-weight: 800;
+  }
+
+  .label .i {
+    font-style: italic;
   }
 
   /* Shape language per kind */
@@ -89,7 +107,6 @@
 
   .action {
     border-radius: 999px;
-    text-align: center;
   }
 
   .note {

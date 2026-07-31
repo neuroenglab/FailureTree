@@ -1,5 +1,5 @@
 import type { Connection } from '@xyflow/svelte';
-import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side } from '../domain/types';
+import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side, TextAlign } from '../domain/types';
 import { defaultEdgeKind } from '../domain/graph';
 import { KIND_LABELS } from '../theme/tokens';
 import { edgeMarker, edgeStyle, makeFlowEdge, makeFlowNode, type FlowEdge, type FlowNode, type NodeData } from './flow';
@@ -198,6 +198,11 @@ class TreeStore {
   setNodeColor(id: string, colorToken: ColorToken | undefined): void {
     this.snapshot();
     this.updateNodeData(id, { colorToken });
+  }
+
+  setNodeAlign(id: string, align: TextAlign | undefined): void {
+    this.snapshot();
+    this.updateNodeData(id, { align });
   }
 
   removeNode(id: string): void {

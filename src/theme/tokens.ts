@@ -1,4 +1,4 @@
-import type { ColorToken, EdgeKind, NodeKind } from '../domain/types';
+import type { ColorToken, EdgeKind, NodeKind, TextAlign } from '../domain/types';
 
 /** All curated swatches, in picker order. Colors live in global.css as custom properties. */
 export const COLOR_TOKENS: ColorToken[] = [
@@ -27,6 +27,15 @@ export const KIND_LABELS: Record<NodeKind, string> = {
   failure: 'Failure mode',
   action: 'Action',
   note: 'Note',
+};
+
+/** Default label alignment per node kind (overridable per node). */
+export const KIND_ALIGN: Record<NodeKind, TextAlign> = {
+  experiment: 'left',
+  component: 'left',
+  failure: 'left',
+  action: 'center',
+  note: 'left',
 };
 
 export const EDGE_LABELS: Record<EdgeKind, string> = {

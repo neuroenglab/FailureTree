@@ -18,15 +18,21 @@ export type ColorToken =
 export interface TreeNode {
   id: string;
   kind: NodeKind;
+  /** May contain newlines and **bold** / *italic* mini-markup. */
   label: string;
   notes?: string;
   /** Overrides the kind's default color. */
   colorToken?: ColorToken;
+  /** Overrides the kind's default label alignment. */
+  align?: TextAlign;
   position: { x: number; y: number };
 }
 
 /** Which side of a node an arrow attaches to. */
 export type Side = 'top' | 'right' | 'bottom' | 'left';
+
+/** Text alignment of a node label. */
+export type TextAlign = 'left' | 'center' | 'right';
 
 export interface TreeEdge {
   id: string;
