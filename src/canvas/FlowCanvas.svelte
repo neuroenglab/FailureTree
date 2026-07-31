@@ -5,6 +5,7 @@
     BackgroundVariant,
     Controls,
     ConnectionMode,
+    SelectionMode,
     type Connection,
     type EdgeTypes,
     type NodeTypes,
@@ -81,6 +82,9 @@
     {onconnect}
     {onconnectend}
     connectionMode={ConnectionMode.Loose}
+    selectionOnDrag
+    selectionMode={SelectionMode.Partial}
+    panOnDrag={[1, 2]}
     onnodedragstart={() => tree.snapshot()}
     onnodedragstop={() => tree.nodesMoved()}
     onbeforedelete={async ({ nodes, edges }) => {
