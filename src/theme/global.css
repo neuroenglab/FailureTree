@@ -1,0 +1,135 @@
+/* ---------------------------------------------------------------------------
+   FailureTree design tokens — the one place to reskin the app.
+   Each swatch has: bg (fill), border, ink (text on the fill).
+   --------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: light dark;
+
+  --font-body: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --shadow-soft: 0 2px 10px rgba(90, 70, 50, 0.1);
+  --shadow-lifted: 0 6px 24px rgba(90, 70, 50, 0.16);
+
+  /* App surfaces — warm cream */
+  --surface-canvas: #faf6ef;
+  --surface-panel: #fffdf8;
+  --surface-grid-dot: #e0d7c8;
+  --ink-strong: #3d3428;
+  --ink-muted: #8a7f6e;
+  --line-soft: #e8e0d2;
+
+  /* Swatches */
+  --swatch-indigo-bg: #e4e4f7;
+  --swatch-indigo-border: #8d8fd4;
+  --swatch-indigo-ink: #3d3f7a;
+
+  --swatch-sand-bg: #f3e8d3;
+  --swatch-sand-border: #cbab77;
+  --swatch-sand-ink: #6d5426;
+
+  --swatch-terracotta-bg: #f8e0d6;
+  --swatch-terracotta-border: #d68a6d;
+  --swatch-terracotta-ink: #83402a;
+
+  --swatch-sage-bg: #e2eedd;
+  --swatch-sage-border: #8fb384;
+  --swatch-sage-ink: #3d5c34;
+
+  --swatch-butter-bg: #faf0cd;
+  --swatch-butter-border: #d9bc63;
+  --swatch-butter-ink: #6e5a17;
+
+  --swatch-rose-bg: #f9e2ea;
+  --swatch-rose-border: #d3829f;
+  --swatch-rose-ink: #7c3352;
+
+  --swatch-sky-bg: #ddedf3;
+  --swatch-sky-border: #7cadc0;
+  --swatch-sky-ink: #2d5568;
+
+  --swatch-plum-bg: #ecdff0;
+  --swatch-plum-border: #ab7cbe;
+  --swatch-plum-ink: #5d3070;
+
+  /* Edge semantics */
+  --edge-leads-to: #9a8f7d;
+  --edge-if-fails: #c9634a;
+  --edge-mitigated-by: #6f9a62;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
+    --shadow-lifted: 0 6px 24px rgba(0, 0, 0, 0.45);
+
+    --surface-canvas: #26221c;
+    --surface-panel: #2e2a23;
+    --surface-grid-dot: #3d382f;
+    --ink-strong: #ede5d8;
+    --ink-muted: #a2988a;
+    --line-soft: #454036;
+
+    --swatch-indigo-bg: #38395c;
+    --swatch-indigo-border: #8d8fd4;
+    --swatch-indigo-ink: #cfd0f2;
+
+    --swatch-sand-bg: #4a3f2b;
+    --swatch-sand-border: #cbab77;
+    --swatch-sand-ink: #ecdcbb;
+
+    --swatch-terracotta-bg: #53342a;
+    --swatch-terracotta-border: #d68a6d;
+    --swatch-terracotta-ink: #f4cdbd;
+
+    --swatch-sage-bg: #34432e;
+    --swatch-sage-border: #8fb384;
+    --swatch-sage-ink: #d3e6cc;
+
+    --swatch-butter-bg: #4c4222;
+    --swatch-butter-border: #d9bc63;
+    --swatch-butter-ink: #f0e3b3;
+
+    --swatch-rose-bg: #4e2f3b;
+    --swatch-rose-border: #d3829f;
+    --swatch-rose-ink: #f2cfdd;
+
+    --swatch-sky-bg: #2b414a;
+    --swatch-sky-border: #7cadc0;
+    --swatch-sky-ink: #cfe6ee;
+
+    --swatch-plum-bg: #443049;
+    --swatch-plum-border: #ab7cbe;
+    --swatch-plum-ink: #e5cfee;
+
+    --edge-leads-to: #877e6e;
+    --edge-if-fails: #d97f66;
+    --edge-mitigated-by: #86ad79;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Base styles
+   --------------------------------------------------------------------------- */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink-strong);
+  background: var(--surface-canvas);
+  overflow: hidden;
+}
