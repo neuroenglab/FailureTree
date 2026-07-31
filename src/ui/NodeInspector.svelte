@@ -36,6 +36,22 @@
     grip.addEventListener('pointerup', onUp);
   }
 
+  /**
+   * Svelte action: remember an element's user-dragged height (textarea resize
+   * corner) so it survives the inspector unmounting on deselect.
+   */
+  function persistHeight(el: HTMLElement, key: string) {
+    const stored = localStorage.getItem(key);
+    if (stored) el.style.height = `${stored}px`;
+    const observer = new ResizeObserver(() => {
+      if (el.offsetHeight > 0) localStorage.setItem(key, String(el.offsetHeight));
+    });
+    observer.observe(el);
+    return {
+      destroy: () => observer.disconnect(),
+    };
+  }
+
   /** Step the font size, snapping back to "unset" when it lands on the default. */
   function stepFont(current: number, delta: number): number | undefined {
     const next = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Math.round(current) + delta));
@@ -67,6 +83,7 @@
       Label
       <textarea
         rows="2"
+        use:persistHeight={'failuretree:ui:label-height'}
         value={node.data.label}
         onfocus={() => tree.snapshot()}
         oninput={(e) => tree.updateNodeData(node.id, { label: e.currentTarget.value })}
@@ -111,6 +128,7 @@
       Notes
       <textarea
         rows="5"
+        use:persistHeight={'failuretree:ui:notes-height'}
         placeholder="What to check, thresholds, links…"
         value={node.data.notes}
         onfocus={() => tree.snapshot()}
