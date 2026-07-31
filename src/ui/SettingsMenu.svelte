@@ -35,21 +35,19 @@
       {/each}
     </select>
 
-    {#if theme === 'warm'}
-      <span class="section">Canvas background</span>
-      <div class="canvases" role="group" aria-label="Canvas background">
-        {#each CANVAS_TOKENS as t (t.id)}
-          <button
-            class="canvas-dot"
-            class:active={t.id === canvas}
-            style={`--c: var(--bg-${t.id}-canvas); --d: var(--bg-${t.id}-dot)`}
-            title={t.label}
-            aria-label={`Background ${t.label}`}
-            onclick={() => tree.updateSettings({ canvas: t.id === 'cream' ? undefined : t.id })}
-          ></button>
-        {/each}
-      </div>
-    {/if}
+    <span class="section">Canvas background</span>
+    <div class="canvases" role="group" aria-label="Canvas background">
+      {#each CANVAS_TOKENS as t (t.id)}
+        <button
+          class="canvas-dot"
+          class:active={t.id === canvas}
+          style={`--c: var(--bg-${t.id}-canvas); --d: var(--bg-${t.id}-dot)`}
+          title={t.label}
+          aria-label={`Background ${t.label}`}
+          onclick={() => tree.updateSettings({ canvas: t.id === 'cream' ? undefined : t.id })}
+        ></button>
+      {/each}
+    </div>
 
     <span class="section">Arrow text size (all arrows)</span>
     <div class="stepper">

@@ -145,6 +145,27 @@
    over both the light and dark :root blocks.
    --------------------------------------------------------------------------- */
 
+/* Light themes pin the light background variants regardless of OS dark
+   mode (their surfaces are fixed-light, so the tints must be too). */
+:root[data-theme='journal'],
+:root[data-theme='paper'],
+:root[data-theme='boardroom'],
+:root[data-theme='ink'],
+:root[data-theme='whiteboard'] {
+  --bg-cream-canvas: #faf6ef;
+  --bg-cream-dot: #e0d7c8;
+  --bg-snow-canvas: #fbfbfa;
+  --bg-snow-dot: #e2e2df;
+  --bg-blush-canvas: #faf1ee;
+  --bg-blush-dot: #e8d5cd;
+  --bg-mint-canvas: #f1f7f0;
+  --bg-mint-dot: #d4e3d2;
+  --bg-sky-canvas: #eff5f8;
+  --bg-sky-dot: #d3e2e9;
+  --bg-stone-canvas: #f2f1ef;
+  --bg-stone-dot: #dcd9d4;
+}
+
 /* Journal — figure in a scientific publication. Color only where meaning
    demands it: failures muted red, actions muted green, the rest quiet navy
    and gray. Faint grid, thin precise lines. */
@@ -290,6 +311,20 @@
   --surface-canvas: #142a4d;
   --surface-panel: #1b345c;
   --surface-grid-dot: #26426f;
+
+  /* Dark background variants that keep chalk text readable. */
+  --bg-cream-canvas: #142a4d;
+  --bg-cream-dot: #26426f;
+  --bg-snow-canvas: #1f2937;
+  --bg-snow-dot: #374151;
+  --bg-blush-canvas: #331f2c;
+  --bg-blush-dot: #4a3242;
+  --bg-mint-canvas: #14342c;
+  --bg-mint-dot: #275247;
+  --bg-sky-canvas: #0e2033;
+  --bg-sky-dot: #1f3a55;
+  --bg-stone-canvas: #24262b;
+  --bg-stone-dot: #3b3e45;
   --ink-strong: #dfeafc;
   --ink-muted: #93abd0;
   --line-soft: #2d4a7c;

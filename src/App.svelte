@@ -13,9 +13,9 @@
     if (theme && theme !== 'warm') document.documentElement.dataset.theme = theme;
     else delete document.documentElement.dataset.theme;
 
-    // The canvas-background override only applies to the default theme —
-    // other themes own their canvas (inline vars would beat [data-theme]).
-    const canvas = !theme || theme === 'warm' ? tree.settings.canvas : undefined;
+    // Background tints resolve against the active theme's --bg-* values,
+    // so every theme supports all six variants.
+    const canvas = tree.settings.canvas;
     if (canvas) {
       root.setProperty('--surface-canvas', `var(--bg-${canvas}-canvas)`);
       root.setProperty('--surface-grid-dot', `var(--bg-${canvas}-dot)`);

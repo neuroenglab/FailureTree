@@ -60,7 +60,7 @@ export const THEMES = [
 
 /** Canvas background choices; colors live in global.css as --bg-<id>-canvas/-dot. */
 export const CANVAS_TOKENS = [
-  { id: 'cream', label: 'Cream' },
+  { id: 'cream', label: 'Theme default' },
   { id: 'snow', label: 'Snow' },
   { id: 'blush', label: 'Blush' },
   { id: 'mint', label: 'Mint' },
