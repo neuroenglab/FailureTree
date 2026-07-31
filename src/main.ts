@@ -3,6 +3,8 @@ import './theme/global.css';
 import App from './App.svelte';
 import { tree } from './state/tree.svelte';
 
+tree.init();
+
 const app = mount(App, {
   target: document.getElementById('app')!,
 });

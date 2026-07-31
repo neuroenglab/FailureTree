@@ -1,0 +1,122 @@
+<script lang="ts">
+  import { tree } from '../state/tree.svelte';
+  import { downloadJson, readJsonFile } from '../export/json';
+
+  let fileInput: HTMLInputElement;
+  let importError = $state('');
+
+  function onPick(event: Event): void {
+    const id = (event.currentTarget as HTMLSelectElement).value;
+    if (id === '__new__') tree.newTree();
+    else tree.openTree(id);
+  }
+
+  async function onImportFile(event: Event): Promise<void> {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    importError = '';
+    try {
+      tree.importTree(await readJsonFile(file));
+    } catch (error) {
+      importError = error instanceof Error ? error.message : 'Import failed.';
+    }
+  }
+
+  function onDelete(): void {
+    if (confirm(`Delete "${tree.treeName}"? This cannot be undone.`)) {
+      tree.deleteCurrentTree();
+    }
+  }
+</script>
+
+<div class="switcher">
+  <select value={tree.treeId} onchange={onPick} title="Switch tree">
+    {#each tree.treeList as t (t.id)}
+      <option value={t.id}>{t.name}</option>
+    {/each}
+    <option value="__new__">＋ New tree…</option>
+  </select>
+
+  <input
+    class="name"
+    type="text"
+    value={tree.treeName}
+    oninput={(e) => tree.renameTree(e.currentTarget.value)}
+    title="Rename this tree"
+  />
+
+  <button title="Export as JSON" onclick={() => downloadJson(tree.toDocument())}>Export</button>
+  <button title="Import a JSON tree" onclick={() => fileInput.click()}>Import</button>
+  <button class="delete" title="Delete this tree" onclick={onDelete}>🗑</button>
+
+  <input
+    type="file"
+    accept="application/json,.json"
+    bind:this={fileInput}
+    onchange={onImportFile}
+    hidden
+  />
+
+  {#if importError}
+    <span class="error" role="alert">{importError}</span>
+  {/if}
+</div>
+
+<style>
+  .switcher {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  select,
+  .name,
+  button {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink-strong);
+    background: var(--surface-canvas);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    padding: 5px 10px;
+  }
+
+  select {
+    max-width: 160px;
+    cursor: pointer;
+  }
+
+  .name {
+    width: 170px;
+    background: transparent;
+  }
+
+  .name:focus {
+    background: var(--surface-canvas);
+    outline: 2px solid var(--swatch-indigo-border);
+    outline-offset: 1px;
+  }
+
+  button {
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+
+  button:hover {
+    background: var(--line-soft);
+  }
+
+  .delete {
+    padding: 5px 8px;
+  }
+
+  .error {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--edge-if-fails);
+    max-width: 220px;
+  }
+</style>

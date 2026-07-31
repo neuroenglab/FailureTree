@@ -25,12 +25,17 @@ export interface TreeNode {
   position: { x: number; y: number };
 }
 
+/** Which side of a node an arrow attaches to. */
+export type Side = 'top' | 'right' | 'bottom' | 'left';
+
 export interface TreeEdge {
   id: string;
   from: string;
   to: string;
   kind: EdgeKind;
   label?: string;
+  fromSide?: Side;
+  toSide?: Side;
 }
 
 export interface FailureTree {

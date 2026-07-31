@@ -31,6 +31,7 @@
     {onconnect}
     connectionMode={ConnectionMode.Loose}
     onnodedragstart={() => tree.snapshot()}
+    onnodedragstop={() => tree.nodesMoved()}
     onbeforedelete={async () => {
       tree.snapshot();
       return true;

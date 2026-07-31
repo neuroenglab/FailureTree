@@ -1,25 +1,12 @@
-import { MarkerType, type Connection, type Edge, type Node } from '@xyflow/svelte';
-import type { ColorToken, EdgeKind, NodeKind } from '../domain/types';
+import type { Connection } from '@xyflow/svelte';
+import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side } from '../domain/types';
 import { defaultEdgeKind } from '../domain/graph';
 import { KIND_LABELS } from '../theme/tokens';
+import { edgeMarker, makeFlowEdge, makeFlowNode, type FlowEdge, type FlowNode, type NodeData } from './flow';
+import { fromDomain, toDomain } from '../persistence/serializer';
+import * as storage from '../persistence/storage';
 
-/**
- * Working state lives in Svelte Flow's node/edge shape, with our domain
- * payload in `data`. persistence/ maps this to the pure FailureTree format.
- */
-export type NodeData = {
-  kind: NodeKind;
-  label: string;
-  notes: string;
-  colorToken?: ColorToken;
-};
-
-export type EdgeData = {
-  kind: EdgeKind;
-};
-
-export type FlowNode = Node<NodeData>;
-export type FlowEdge = Edge<EdgeData>;
+export type { EdgeData, FlowEdge, FlowNode, NodeData } from './flow';
 
 type Snapshot = {
   nodes: FlowNode[];
@@ -27,21 +14,20 @@ type Snapshot = {
 };
 
 const HISTORY_LIMIT = 100;
-
-function edgeColor(kind: EdgeKind): string {
-  return `var(--edge-${kind})`;
-}
-
-function edgeMarker(kind: EdgeKind) {
-  return { type: MarkerType.ArrowClosed, width: 16, height: 16, color: edgeColor(kind) };
-}
+const AUTOSAVE_DELAY_MS = 400;
 
 class TreeStore {
   nodes = $state.raw<FlowNode[]>([]);
   edges = $state.raw<FlowEdge[]>([]);
 
+  treeId = $state('');
+  treeName = $state('');
+  treeList = $state.raw<storage.TreeListing[]>([]);
+
+  private createdAt = '';
   private undoStack = $state.raw<Snapshot[]>([]);
   private redoStack = $state.raw<Snapshot[]>([]);
+  private saveTimer: ReturnType<typeof setTimeout> | undefined;
 
   get selectedNode(): FlowNode | undefined {
     return this.nodes.find((n) => n.selected);
@@ -59,12 +45,112 @@ class TreeStore {
     return this.redoStack.length > 0;
   }
 
+  // --- document lifecycle -------------------------------------------------
+
+  /** Open the last-used tree, or create a fresh one. Called once at startup. */
+  init(): void {
+    const lastId = storage.lastOpenId();
+    const doc = lastId ? storage.loadTree(lastId) : null;
+    if (doc) {
+      this.hydrate(doc);
+      this.refreshList();
+    } else {
+      this.newTree('My first tree');
+    }
+  }
+
+  newTree(name = 'Untitled tree'): void {
+    this.persistNow();
+    this.hydrate({
+      id: crypto.randomUUID(),
+      name,
+      nodes: [],
+      edges: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      schemaVersion: 1,
+    });
+    this.persistNow();
+  }
+
+  openTree(id: string): void {
+    if (id === this.treeId) return;
+    const doc = storage.loadTree(id);
+    if (!doc) return;
+    this.persistNow();
+    this.hydrate(doc);
+  }
+
+  /** Import a document from a file as a new tree (fresh id, no collisions). */
+  importTree(doc: FailureTree): void {
+    this.persistNow();
+    this.hydrate({ ...doc, id: crypto.randomUUID() });
+    this.persistNow();
+  }
+
+  deleteCurrentTree(): void {
+    storage.deleteTree(this.treeId);
+    const next = storage.listTrees()[0];
+    const doc = next ? storage.loadTree(next.id) : null;
+    if (doc) this.hydrate(doc);
+    else this.newTree();
+    this.refreshList();
+  }
+
+  renameTree(name: string): void {
+    this.treeName = name;
+    this.scheduleSave();
+  }
+
+  toDocument(): FailureTree {
+    return toDomain(
+      { id: this.treeId, name: this.treeName, createdAt: this.createdAt },
+      this.nodes,
+      this.edges,
+    );
+  }
+
+  private hydrate(doc: FailureTree): void {
+    const { nodes, edges } = fromDomain(doc);
+    this.treeId = doc.id;
+    this.treeName = doc.name;
+    this.createdAt = doc.createdAt;
+    this.nodes = nodes;
+    this.edges = edges;
+    this.undoStack = [];
+    this.redoStack = [];
+    storage.rememberLastOpen(doc.id);
+  }
+
+  // --- autosave -----------------------------------------------------------
+
+  scheduleSave(): void {
+    clearTimeout(this.saveTimer);
+    this.saveTimer = setTimeout(() => this.persistNow(), AUTOSAVE_DELAY_MS);
+  }
+
+  persistNow(): void {
+    clearTimeout(this.saveTimer);
+    if (!this.treeId) return;
+    storage.saveTree(this.toDocument());
+    this.refreshList();
+  }
+
+  private refreshList(): void {
+    this.treeList = storage.listTrees();
+  }
+
+  // --- history ------------------------------------------------------------
+
   /**
    * Record the current state as an undo point. Arrays are replaced (never
    * mutated) on every change, so snapshots are cheap references.
    */
   snapshot(): void {
-    this.undoStack = [...this.undoStack.slice(-(HISTORY_LIMIT - 1)), { nodes: this.nodes, edges: this.edges }];
+    this.undoStack = [
+      ...this.undoStack.slice(-(HISTORY_LIMIT - 1)),
+      { nodes: this.nodes, edges: this.edges },
+    ];
     this.redoStack = [];
   }
 
@@ -75,6 +161,7 @@ class TreeStore {
     this.redoStack = [...this.redoStack, { nodes: this.nodes, edges: this.edges }];
     this.nodes = past.nodes;
     this.edges = past.edges;
+    this.scheduleSave();
   }
 
   redo(): void {
@@ -84,32 +171,46 @@ class TreeStore {
     this.undoStack = [...this.undoStack, { nodes: this.nodes, edges: this.edges }];
     this.nodes = future.nodes;
     this.edges = future.edges;
+    this.scheduleSave();
   }
+
+  // --- graph edits --------------------------------------------------------
 
   addNode(kind: NodeKind, position: { x: number; y: number }): void {
     this.snapshot();
-    const node: FlowNode = {
-      id: crypto.randomUUID(),
-      type: 'tree-node',
-      position,
-      data: { kind, label: `New ${KIND_LABELS[kind].toLowerCase()}`, notes: '' },
-    };
-    this.nodes = [...this.nodes, node];
+    this.nodes = [
+      ...this.nodes,
+      makeFlowNode({
+        id: crypto.randomUUID(),
+        kind,
+        label: `New ${KIND_LABELS[kind].toLowerCase()}`,
+        position,
+      }),
+    ];
+    this.scheduleSave();
   }
 
   updateNodeData(id: string, patch: Partial<NodeData>): void {
     this.nodes = this.nodes.map((n) => (n.id === id ? { ...n, data: { ...n.data, ...patch } } : n));
+    this.scheduleSave();
+  }
+
+  setNodeColor(id: string, colorToken: ColorToken | undefined): void {
+    this.snapshot();
+    this.updateNodeData(id, { colorToken });
   }
 
   removeNode(id: string): void {
     this.snapshot();
     this.nodes = this.nodes.filter((n) => n.id !== id);
     this.edges = this.edges.filter((e) => e.source !== id && e.target !== id);
+    this.scheduleSave();
   }
 
   removeEdge(id: string): void {
     this.snapshot();
     this.edges = this.edges.filter((e) => e.id !== id);
+    this.scheduleSave();
   }
 
   setEdgeKind(id: string, kind: EdgeKind): void {
@@ -119,6 +220,7 @@ class TreeStore {
         ? { ...e, class: `edge-${kind}`, data: { ...e.data, kind }, markerEnd: edgeMarker(kind) }
         : e,
     );
+    this.scheduleSave();
   }
 
   connect(connection: Connection): void {
@@ -133,19 +235,23 @@ class TreeStore {
     );
     this.snapshot();
 
-    const kind = defaultEdgeKind(source.data.kind, target.data.kind);
-    const edge: FlowEdge = {
-      id: crypto.randomUUID(),
-      source: connection.source,
-      target: connection.target,
-      sourceHandle: connection.sourceHandle,
-      targetHandle: connection.targetHandle,
-      class: `edge-${kind}`,
-      data: { kind },
-      markerEnd: edgeMarker(kind),
-    };
+    this.edges = [
+      ...this.edges,
+      makeFlowEdge({
+        id: crypto.randomUUID(),
+        source: connection.source,
+        target: connection.target,
+        kind: defaultEdgeKind(source.data.kind, target.data.kind),
+        sourceHandle: connection.sourceHandle as Side | null,
+        targetHandle: connection.targetHandle as Side | null,
+      }),
+    ];
+    this.scheduleSave();
+  }
 
-    this.edges = [...this.edges, edge];
+  /** Called by the canvas when a node drag finishes (positions changed via binding). */
+  nodesMoved(): void {
+    this.scheduleSave();
   }
 }
 

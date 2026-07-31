@@ -1,0 +1,70 @@
+import { MarkerType, type Edge, type Node } from '@xyflow/svelte';
+import type { ColorToken, EdgeKind, NodeKind, Side } from '../domain/types';
+
+/**
+ * Working state lives in Svelte Flow's node/edge shape, with our domain
+ * payload in `data`. persistence/ maps this to the pure FailureTree format.
+ */
+export type NodeData = {
+  kind: NodeKind;
+  label: string;
+  notes: string;
+  colorToken?: ColorToken;
+};
+
+export type EdgeData = {
+  kind: EdgeKind;
+};
+
+export type FlowNode = Node<NodeData>;
+export type FlowEdge = Edge<EdgeData>;
+
+export function edgeMarker(kind: EdgeKind) {
+  return {
+    type: MarkerType.ArrowClosed,
+    width: 16,
+    height: 16,
+    color: `var(--edge-${kind})`,
+  };
+}
+
+export function makeFlowNode(args: {
+  id: string;
+  kind: NodeKind;
+  label: string;
+  notes?: string;
+  colorToken?: ColorToken;
+  position: { x: number; y: number };
+}): FlowNode {
+  return {
+    id: args.id,
+    type: 'tree-node',
+    position: args.position,
+    data: {
+      kind: args.kind,
+      label: args.label,
+      notes: args.notes ?? '',
+      colorToken: args.colorToken,
+    },
+  };
+}
+
+export function makeFlowEdge(args: {
+  id: string;
+  source: string;
+  target: string;
+  kind: EdgeKind;
+  sourceHandle?: Side | null;
+  targetHandle?: Side | null;
+}): FlowEdge {
+  return {
+    id: args.id,
+    source: args.source,
+    target: args.target,
+    sourceHandle: args.sourceHandle ?? undefined,
+    targetHandle: args.targetHandle ?? undefined,
+    class: `edge-${args.kind}`,
+    data: { kind: args.kind },
+    markerEnd: edgeMarker(args.kind),
+  };
+}

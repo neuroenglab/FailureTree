@@ -1,6 +1,7 @@
 <script lang="ts">
   import FlowCanvas from './canvas/FlowCanvas.svelte';
   import NodeInspector from './ui/NodeInspector.svelte';
+  import TreeSwitcher from './ui/TreeSwitcher.svelte';
   import { tree } from './state/tree.svelte';
 
   function handleKey(event: KeyboardEvent): void {
@@ -28,6 +29,7 @@
   <header class="topbar">
     <span class="logo">🌳</span>
     <h1>FailureTree</h1>
+    <TreeSwitcher />
     <div class="spacer"></div>
     <button class="history" title="Undo (Ctrl+Z)" disabled={!tree.canUndo} onclick={() => tree.undo()}>
       ↩

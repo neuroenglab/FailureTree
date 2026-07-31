@@ -43,12 +43,8 @@
           style={`--sw: var(--swatch-${token}-border)`}
           title={token}
           aria-label={`Color ${token}`}
-          onclick={() => {
-            tree.snapshot();
-            tree.updateNodeData(node.id, {
-              colorToken: token === KIND_COLORS[node.data.kind] ? undefined : token,
-            });
-          }}
+          onclick={() =>
+            tree.setNodeColor(node.id, token === KIND_COLORS[node.data.kind] ? undefined : token)}
         ></button>
       {/each}
     </div>
