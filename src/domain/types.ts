@@ -25,6 +25,10 @@ export interface TreeNode {
   colorToken?: ColorToken;
   /** Overrides the kind's default label alignment. */
   align?: TextAlign;
+  /** Label font size in px; unset means the default (14.4). */
+  fontSize?: number;
+  /** Explicit size once the node has been manually resized. */
+  size?: { width: number; height: number };
   position: { x: number; y: number };
 }
 

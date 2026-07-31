@@ -6,16 +6,22 @@
     Controls,
     ConnectionMode,
     type Connection,
+    type EdgeTypes,
     type NodeTypes,
   } from '@xyflow/svelte';
   import '@xyflow/svelte/dist/style.css';
   import './flow.css';
   import { tree } from '../state/tree.svelte';
   import TreeNodeView from './TreeNodeView.svelte';
+  import TreeEdgeView from './TreeEdgeView.svelte';
   import Toolbar from '../ui/Toolbar.svelte';
 
   const nodeTypes: NodeTypes = {
     'tree-node': TreeNodeView,
+  };
+
+  const edgeTypes: EdgeTypes = {
+    'tree-edge': TreeEdgeView,
   };
 
   function onconnect(connection: Connection): void {
@@ -28,6 +34,7 @@
     bind:nodes={tree.nodes}
     bind:edges={tree.edges}
     {nodeTypes}
+    {edgeTypes}
     {onconnect}
     connectionMode={ConnectionMode.Loose}
     onnodedragstart={() => tree.snapshot()}

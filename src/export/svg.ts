@@ -13,8 +13,8 @@ const PAD = 48;
 const NODE_PAD_X = 16;
 const FALLBACK_NODE = { width: 170, height: 58 };
 const TAG_SIZE = 9.6;
-const LABEL_SIZE = 14.4;
-const LINE_HEIGHT = 18;
+const DEFAULT_LABEL_SIZE = 14.4;
+const EDGE_LABEL_SIZE = 11.5;
 const FONT_STACK = 'Nunito, Segoe UI, sans-serif';
 const ARROW = 9;
 
@@ -51,14 +51,14 @@ function esc(text: string): string {
 
 let ctx: CanvasRenderingContext2D | null = null;
 
-function measure(seg: Segment, text: string): number {
+function measure(seg: Segment, text: string, size: number): number {
   ctx ??= document.createElement('canvas').getContext('2d')!;
-  ctx.font = `${seg.italic ? 'italic ' : ''}${seg.bold ? 800 : 600} ${LABEL_SIZE}px ${FONT_STACK}`;
+  ctx.font = `${seg.italic ? 'italic ' : ''}${seg.bold ? 800 : 600} ${size}px ${FONT_STACK}`;
   return ctx.measureText(text).width;
 }
 
 /** Re-wrap parsed lines to fit maxWidth, splitting at spaces. */
-function wrapLines(lines: Line[], maxWidth: number): Line[] {
+function wrapLines(lines: Line[], maxWidth: number, size: number): Line[] {
   const out: Line[] = [];
   for (const line of lines) {
     let current: Line = [];
@@ -66,7 +66,7 @@ function wrapLines(lines: Line[], maxWidth: number): Line[] {
     for (const seg of line) {
       for (const token of seg.text.split(/(\s+)/)) {
         if (!token) continue;
-        const w = measure(seg, token);
+        const w = measure(seg, token, size);
         const isSpace = /^\s+$/.test(token);
         if (!isSpace && width + w > maxWidth && current.length > 0) {
           out.push(current);
@@ -155,11 +155,27 @@ function renderEdge(edge: FlowEdge, boxes: Map<string, Box>, theme: Theme): stri
     kind === 'mitigated-by' ? ' stroke-dasharray="2 6" stroke-linecap="round"' : '';
 
   const r = (n: number) => Math.round(n * 100) / 100;
-  return (
+  let svg =
     `<path d="M ${r(from.x)} ${r(from.y)} C ${r(c1.x)} ${r(c1.y)}, ${r(c2.x)} ${r(c2.y)}, ${r(lineEnd.x)} ${r(lineEnd.y)}" ` +
     `fill="none" stroke="${color}" stroke-width="2.2"${dash}/>` +
-    `<path d="M ${r(to.x)} ${r(to.y)} L ${r(left.x)} ${r(left.y)} L ${r(right.x)} ${r(right.y)} Z" fill="${color}"/>`
-  );
+    `<path d="M ${r(to.x)} ${r(to.y)} L ${r(left.x)} ${r(left.y)} L ${r(right.x)} ${r(right.y)} Z" fill="${color}"/>`;
+
+  const label = edge.data?.label;
+  if (label) {
+    // Cubic bezier midpoint; a canvas-colored pill behind the text makes the
+    // arrow appear to break around it — same effect as on screen.
+    const mid = {
+      x: (from.x + 3 * c1.x + 3 * c2.x + to.x) / 8,
+      y: (from.y + 3 * c1.y + 3 * c2.y + to.y) / 8,
+    };
+    const textW = measure({ text: label, bold: true, italic: false }, label, EDGE_LABEL_SIZE);
+    const padX = 8;
+    const h = EDGE_LABEL_SIZE + 8;
+    svg +=
+      `<rect x="${r(mid.x - textW / 2 - padX)}" y="${r(mid.y - h / 2)}" width="${r(textW + padX * 2)}" height="${h}" rx="${h / 2}" fill="${theme.surface}"/>` +
+      `<text x="${r(mid.x)}" y="${r(mid.y + EDGE_LABEL_SIZE * 0.34)}" text-anchor="middle" font-family="${FONT_STACK}" font-size="${EDGE_LABEL_SIZE}" font-weight="800" fill="${color}">${esc(label)}</text>`;
+  }
+  return svg;
 }
 
 function nodeRadius(node: FlowNode, box: Box): number {
@@ -179,23 +195,32 @@ function renderNode(node: FlowNode, theme: Theme): string {
   const align: TextAlign = node.data.align ?? KIND_ALIGN[node.data.kind];
   const dash = node.data.kind === 'failure' ? ' stroke-dasharray="6 4"' : '';
 
-  const lines = wrapLines(parseRichText(node.data.label), box.width - NODE_PAD_X * 2);
+  const labelSize = node.data.fontSize ?? DEFAULT_LABEL_SIZE;
+  const lineHeight = Math.round(labelSize * 1.25);
+  const lines = wrapLines(parseRichText(node.data.label), box.width - NODE_PAD_X * 2, labelSize);
 
   const anchorAttr = align === 'center' ? 'middle' : align === 'right' ? 'end' : 'start';
   const textX =
     align === 'center' ? box.width / 2 : align === 'right' ? box.width - NODE_PAD_X : NODE_PAD_X;
 
+  // Manually resized nodes center their content vertically (as on screen);
+  // auto-sized nodes flow from the top.
+  const tagHeight = 14;
+  const blockHeight = tagHeight + lines.length * lineHeight;
+  const blockTop = node.width != null ? Math.max(6, (box.height - blockHeight) / 2) : 8;
+  const tagBaseline = blockTop + TAG_SIZE;
+  let y = blockTop + tagHeight + labelSize * 0.85;
+
   let text = '';
-  let y = 34;
   for (const line of lines) {
-    text += `<text x="${textX}" y="${y}" text-anchor="${anchorAttr}" font-family="${FONT_STACK}" font-size="${LABEL_SIZE}" fill="${ink}">${lineToTspans(line)}</text>`;
-    y += LINE_HEIGHT;
+    text += `<text x="${textX}" y="${Math.round(y)}" text-anchor="${anchorAttr}" font-family="${FONT_STACK}" font-size="${labelSize}" fill="${ink}">${lineToTspans(line)}</text>`;
+    y += lineHeight;
   }
 
   return (
     `<g transform="translate(${Math.round(node.position.x)}, ${Math.round(node.position.y)})">` +
     `<rect width="${box.width}" height="${box.height}" rx="${nodeRadius(node, box)}" fill="${bg}" stroke="${border}" stroke-width="2"${dash}/>` +
-    `<text x="${NODE_PAD_X}" y="19" font-family="${FONT_STACK}" font-size="${TAG_SIZE}" font-weight="800" letter-spacing="0.9" fill="${ink}" opacity="0.65">${esc(KIND_LABELS[node.data.kind].toUpperCase())}</text>` +
+    `<text x="${NODE_PAD_X}" y="${Math.round(tagBaseline)}" font-family="${FONT_STACK}" font-size="${TAG_SIZE}" font-weight="800" letter-spacing="0.9" fill="${ink}" opacity="0.65">${esc(KIND_LABELS[node.data.kind].toUpperCase())}</text>` +
     text +
     `</g>`
   );

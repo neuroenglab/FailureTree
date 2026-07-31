@@ -7,6 +7,16 @@
   const edge = $derived(tree.selectedEdge);
 
   const EDGE_KINDS: EdgeKind[] = ['leads-to', 'if-fails', 'mitigated-by'];
+
+  const DEFAULT_FONT_SIZE = 14.4;
+  const MIN_FONT_SIZE = 10;
+  const MAX_FONT_SIZE = 28;
+
+  /** Step the font size, snapping back to "unset" when it lands on the default. */
+  function stepFont(current: number, delta: number): number | undefined {
+    const next = Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, Math.round(current) + delta));
+    return Math.abs(next - DEFAULT_FONT_SIZE) < 1 ? undefined : next;
+  }
   const ALIGNS: { value: TextAlign; icon: string; title: string }[] = [
     { value: 'left', icon: '⯇', title: 'Align left' },
     { value: 'center', icon: '☰', title: 'Align center' },
@@ -17,6 +27,7 @@
 {#if node}
   {@const activeToken = node.data.colorToken ?? KIND_COLORS[node.data.kind]}
   {@const activeAlign = node.data.align ?? KIND_ALIGN[node.data.kind]}
+  {@const fontSize = node.data.fontSize ?? DEFAULT_FONT_SIZE}
   <aside class="inspector">
     <span class="kind-tag">{KIND_LABELS[node.data.kind]}</span>
 
@@ -44,6 +55,24 @@
           {a.icon}
         </button>
       {/each}
+    </div>
+
+    <div class="fontsize" role="group" aria-label="Text size">
+      <button
+        title="Smaller text"
+        disabled={fontSize <= MIN_FONT_SIZE}
+        onclick={() => tree.setNodeFontSize(node.id, stepFont(fontSize, -2))}
+      >
+        A−
+      </button>
+      <span class="fontsize-value">{Math.round(fontSize)} px</span>
+      <button
+        title="Larger text"
+        disabled={fontSize >= MAX_FONT_SIZE}
+        onclick={() => tree.setNodeFontSize(node.id, stepFont(fontSize, 2))}
+      >
+        A+
+      </button>
     </div>
 
     <label>
@@ -76,6 +105,17 @@
 {:else if edge}
   <aside class="inspector">
     <span class="kind-tag">Arrow</span>
+
+    <label>
+      Label
+      <input
+        type="text"
+        placeholder="e.g. after 3 retries"
+        value={edge.data?.label ?? ''}
+        onfocus={() => tree.snapshot()}
+        oninput={(e) => tree.updateEdgeData(edge.id, { label: e.currentTarget.value })}
+      />
+    </label>
 
     <div class="edge-kinds" role="group" aria-label="Arrow meaning">
       {#each EDGE_KINDS as kind (kind)}
@@ -129,7 +169,8 @@
     color: var(--ink-muted);
   }
 
-  textarea {
+  textarea,
+  input[type='text'] {
     font-family: var(--font-body);
     font-size: 0.88rem;
     font-weight: 600;
@@ -141,9 +182,41 @@
     resize: vertical;
   }
 
-  textarea:focus {
+  textarea:focus,
+  input[type='text']:focus {
     outline: 2px solid var(--swatch-indigo-border);
     outline-offset: 1px;
+  }
+
+  .fontsize {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fontsize button {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--ink-strong);
+    background: var(--surface-canvas);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    cursor: pointer;
+  }
+
+  .fontsize button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .fontsize-value {
+    flex: 1;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ink-muted);
   }
 
   .hint {

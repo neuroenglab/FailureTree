@@ -1,19 +1,22 @@
 <script lang="ts">
-  import { Handle, Position, type NodeProps } from '@xyflow/svelte';
+  import { Handle, NodeResizer, Position, type NodeProps } from '@xyflow/svelte';
   import type { FlowNode } from '../state/tree.svelte';
+  import { tree } from '../state/tree.svelte';
   import { parseRichText } from '../domain/richtext';
   import { KIND_ALIGN, KIND_COLORS, KIND_LABELS } from '../theme/tokens';
 
-  let { data, selected }: NodeProps<FlowNode> = $props();
+  let { data, selected, width }: NodeProps<FlowNode> = $props();
 
   const token = $derived(data.colorToken ?? KIND_COLORS[data.kind]);
   const align = $derived(data.align ?? KIND_ALIGN[data.kind]);
   const lines = $derived(parseRichText(data.label));
+  const sized = $derived(width != null);
 </script>
 
 <div
   class="tree-node"
   class:selected
+  class:sized
   class:experiment={data.kind === 'experiment'}
   class:component={data.kind === 'component'}
   class:failure={data.kind === 'failure'}
@@ -21,8 +24,16 @@
   class:note={data.kind === 'note'}
   style={`--n-bg: var(--swatch-${token}-bg); --n-border: var(--swatch-${token}-border); --n-ink: var(--swatch-${token}-ink);`}
 >
+  <NodeResizer
+    isVisible={selected}
+    minWidth={110}
+    minHeight={44}
+    color="var(--n-border)"
+    onResizeStart={() => tree.snapshot()}
+    onResizeEnd={() => tree.nodesMoved()}
+  />
   <span class="kind-tag">{KIND_LABELS[data.kind]}</span>
-  <div class="label" style:text-align={align}>
+  <div class="label" style:text-align={align} style:font-size={data.fontSize ? `${data.fontSize}px` : undefined}>
     {#each lines as line, i (i)}
       {#if i > 0}<br />{/if}
       {#each line as seg, j (j)}
@@ -52,6 +63,17 @@
     transition:
       box-shadow 0.15s ease,
       transform 0.15s ease;
+  }
+
+  /* Manually resized: fill the wrapper's explicit size, center content. */
+  .tree-node.sized {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .tree-node:hover {

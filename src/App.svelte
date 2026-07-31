@@ -19,6 +19,12 @@
     } else if (key === 'y') {
       event.preventDefault();
       tree.redo();
+    } else if (key === 'c') {
+      tree.copySelection();
+    } else if (key === 'x') {
+      tree.cutSelection();
+    } else if (key === 'v') {
+      tree.paste();
     }
   }
 </script>

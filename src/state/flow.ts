@@ -11,10 +11,12 @@ export type NodeData = {
   notes: string;
   colorToken?: ColorToken;
   align?: TextAlign;
+  fontSize?: number;
 };
 
 export type EdgeData = {
   kind: EdgeKind;
+  label?: string;
 };
 
 export type FlowNode = Node<NodeData>;
@@ -47,18 +49,23 @@ export function makeFlowNode(args: {
   notes?: string;
   colorToken?: ColorToken;
   align?: TextAlign;
+  fontSize?: number;
+  size?: { width: number; height: number };
   position: { x: number; y: number };
 }): FlowNode {
   return {
     id: args.id,
     type: 'tree-node',
     position: args.position,
+    width: args.size?.width,
+    height: args.size?.height,
     data: {
       kind: args.kind,
       label: args.label,
       notes: args.notes ?? '',
       colorToken: args.colorToken,
       align: args.align,
+      fontSize: args.fontSize,
     },
   };
 }
@@ -68,18 +75,20 @@ export function makeFlowEdge(args: {
   source: string;
   target: string;
   kind: EdgeKind;
+  label?: string;
   sourceHandle?: Side | null;
   targetHandle?: Side | null;
 }): FlowEdge {
   return {
     id: args.id,
+    type: 'tree-edge',
     source: args.source,
     target: args.target,
     sourceHandle: args.sourceHandle ?? undefined,
     targetHandle: args.targetHandle ?? undefined,
     class: `edge-${args.kind}`,
     style: edgeStyle(args.kind),
-    data: { kind: args.kind },
+    data: { kind: args.kind, label: args.label },
     markerEnd: edgeMarker(args.kind),
   };
 }

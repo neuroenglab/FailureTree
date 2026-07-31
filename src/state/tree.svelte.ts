@@ -2,7 +2,7 @@ import type { Connection } from '@xyflow/svelte';
 import type { ColorToken, EdgeKind, FailureTree, NodeKind, Side, TextAlign } from '../domain/types';
 import { defaultEdgeKind } from '../domain/graph';
 import { KIND_LABELS } from '../theme/tokens';
-import { edgeMarker, edgeStyle, makeFlowEdge, makeFlowNode, type FlowEdge, type FlowNode, type NodeData } from './flow';
+import { edgeMarker, edgeStyle, makeFlowEdge, makeFlowNode, type EdgeData, type FlowEdge, type FlowNode, type NodeData } from './flow';
 import { fromDomain, toDomain } from '../persistence/serializer';
 import * as storage from '../persistence/storage';
 
@@ -28,6 +28,7 @@ class TreeStore {
   private undoStack = $state.raw<Snapshot[]>([]);
   private redoStack = $state.raw<Snapshot[]>([]);
   private saveTimer: ReturnType<typeof setTimeout> | undefined;
+  private clipboard: Snapshot | null = null;
 
   get selectedNode(): FlowNode | undefined {
     return this.nodes.find((n) => n.selected);
@@ -205,6 +206,11 @@ class TreeStore {
     this.updateNodeData(id, { align });
   }
 
+  setNodeFontSize(id: string, fontSize: number | undefined): void {
+    this.snapshot();
+    this.updateNodeData(id, { fontSize });
+  }
+
   removeNode(id: string): void {
     this.snapshot();
     this.nodes = this.nodes.filter((n) => n.id !== id);
@@ -215,6 +221,60 @@ class TreeStore {
   removeEdge(id: string): void {
     this.snapshot();
     this.edges = this.edges.filter((e) => e.id !== id);
+    this.scheduleSave();
+  }
+
+  updateEdgeData(id: string, patch: Partial<EdgeData>): void {
+    this.edges = this.edges.map((e) =>
+      e.id === id ? { ...e, data: { kind: e.data?.kind ?? 'leads-to', ...e.data, ...patch } } : e,
+    );
+    this.scheduleSave();
+  }
+
+  // --- clipboard ----------------------------------------------------------
+
+  /** Copy the selected nodes plus any edges connecting two of them. */
+  copySelection(): void {
+    const nodes = this.nodes.filter((n) => n.selected);
+    if (nodes.length === 0) return;
+    const ids = new Set(nodes.map((n) => n.id));
+    const edges = this.edges.filter((e) => ids.has(e.source) && ids.has(e.target));
+    this.clipboard = { nodes, edges };
+  }
+
+  cutSelection(): void {
+    this.copySelection();
+    const ids = new Set(this.nodes.filter((n) => n.selected).map((n) => n.id));
+    if (ids.size === 0) return;
+    this.snapshot();
+    this.nodes = this.nodes.filter((n) => !ids.has(n.id));
+    this.edges = this.edges.filter((e) => !ids.has(e.source) && !ids.has(e.target));
+    this.scheduleSave();
+  }
+
+  /** Paste with a small offset; pasted elements become the new selection. */
+  paste(): void {
+    if (!this.clipboard) return;
+    this.snapshot();
+    const OFFSET = 28;
+    const idMap = new Map(this.clipboard.nodes.map((n) => [n.id, crypto.randomUUID()]));
+    const pastedNodes: FlowNode[] = this.clipboard.nodes.map((n) => ({
+      ...n,
+      id: idMap.get(n.id)!,
+      position: { x: n.position.x + OFFSET, y: n.position.y + OFFSET },
+      selected: true,
+    }));
+    const pastedEdges: FlowEdge[] = this.clipboard.edges.map((e) => ({
+      ...e,
+      id: crypto.randomUUID(),
+      source: idMap.get(e.source)!,
+      target: idMap.get(e.target)!,
+      selected: false,
+    }));
+    this.nodes = [...this.nodes.map((n) => ({ ...n, selected: false })), ...pastedNodes];
+    this.edges = [...this.edges.map((e) => ({ ...e, selected: false })), ...pastedEdges];
+    // Next paste of the same clipboard lands further along, not on top.
+    this.clipboard = { nodes: pastedNodes, edges: pastedEdges };
     this.scheduleSave();
   }
 

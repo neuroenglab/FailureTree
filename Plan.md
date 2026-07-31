@@ -105,9 +105,16 @@ Each milestone ends with something that runs — no big-bang integration.
 ### Ideas for later
 
 - Keyboard shortcuts for adding nodes; double-click canvas to add.
-- Edge labels (short text on arrows).
 - Checklists on Action nodes.
 - Auto-layout button (tidy the tree).
+
+### Post-plan additions (done)
+
+- Multi-line labels with **bold** / *italic* mini-markup and per-node alignment + text size.
+- True-vector SVG/PDF export (portable, crisp at any zoom).
+- Node resizing (drag handles when selected).
+- Copy / cut / paste (Ctrl+C/X/V), pasted nodes keep styling.
+- Edge labels shown mid-arrow with the line breaking around the text.
 
 ## Decisions on record
 
