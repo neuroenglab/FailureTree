@@ -5,6 +5,7 @@
     BackgroundVariant,
     Controls,
     ConnectionMode,
+    Panel,
     SelectionMode,
     type Connection,
     type EdgeTypes,
@@ -28,6 +29,23 @@
   const edgeTypes: EdgeTypes = {
     'tree-edge': TreeEdgeView,
   };
+
+  // --- input mode -----------------------------------------------------------
+  // Fingers pan (one-finger drag; pinch zooms), while Pencil and mouse
+  // box-select on drag. selectionOnDrag would otherwise capture the first
+  // touch and a second finger could never hand the gesture over to panning.
+  // The mode follows whichever pointer last touched the canvas; the lasso
+  // toggle lets finger-only users box-select too.
+  const touchDevice = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
+  let inputMode = $state<'touch' | 'precise'>(touchDevice ? 'touch' : 'precise');
+  let lasso = $state(false);
+
+  function hintPointerType(event: PointerEvent): void {
+    const mode = event.pointerType === 'touch' ? 'touch' : 'precise';
+    if (mode !== inputMode) inputMode = mode;
+  }
+
+  const selectOnDrag = $derived(lasso || inputMode === 'precise');
 
   function onconnect(connection: Connection): void {
     tree.connect(connection);
@@ -73,7 +91,8 @@
   });
 </script>
 
-<div class="flow">
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="flow" onpointerdowncapture={hintPointerType} onpointermovecapture={hintPointerType}>
   <SvelteFlow
     bind:nodes={tree.nodes}
     bind:edges={tree.edges}
@@ -82,9 +101,9 @@
     {onconnect}
     {onconnectend}
     connectionMode={ConnectionMode.Loose}
-    selectionOnDrag
+    selectionOnDrag={selectOnDrag}
     selectionMode={SelectionMode.Partial}
-    panOnDrag={[1, 2]}
+    panOnDrag={selectOnDrag ? [1, 2] : true}
     zoomOnPinch
     onnodedragstart={() => tree.snapshot()}
     onnodedragstop={() => tree.nodesMoved()}
@@ -111,6 +130,19 @@
     />
     <Controls />
     <Toolbar />
+    {#if touchDevice}
+      <Panel position="bottom-right">
+        <button
+          class="lasso"
+          class:active={lasso}
+          aria-pressed={lasso}
+          title={lasso ? 'Lasso on: one finger selects. Tap to go back to panning.' : 'Lasso: select by dragging a finger'}
+          onclick={() => (lasso = !lasso)}
+        >
+          ⬚ Select
+        </button>
+      </Panel>
+    {/if}
   </SvelteFlow>
 
   {#if tree.nodes.length === 0}
@@ -126,6 +158,26 @@
   .flow {
     height: 100%;
     position: relative;
+  }
+
+  .lasso {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink-strong);
+    background: var(--surface-panel);
+    border: 1px solid var(--line-soft);
+    border-radius: 999px;
+    padding: 9px 16px;
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .lasso.active {
+    background: var(--swatch-indigo-bg);
+    border-color: var(--swatch-indigo-border);
+    color: var(--swatch-indigo-ink);
   }
 
   .empty-hint {
