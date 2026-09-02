@@ -1,0 +1,1028 @@
+{
+  "id": "2d8d5091-5559-464c-95f1-a0e44d3b27c3",
+  "name": "Disaster Tree v0.7.0",
+  "createdAt": "2026-07-31T00:00:00.000Z",
+  "updatedAt": "2026-07-31T16:12:12.799Z",
+  "schemaVersion": 1,
+  "settings": {
+    "edgeLabelSize": 18,
+    "canvas": "snow",
+    "theme": "journal"
+  },
+  "nodes": [
+    {
+      "id": "i-hd-iemg-3",
+      "kind": "component",
+      "label": "**I** · Does \n**HD-iEMG (3 cm)**\n work/see signal?",
+      "align": "center",
+      "position": {
+        "x": 36.169399402841165,
+        "y": 40.78168014348368
+      }
+    },
+    {
+      "id": "i-hd-iemg-2",
+      "kind": "component",
+      "label": "Does \n**HD-iEMG (2 cm)**\nwork/see signal?",
+      "align": "center",
+      "position": {
+        "x": 555.42400448345,
+        "y": 46.798210266329434
+      }
+    },
+    {
+      "id": "i-hd-semg",
+      "kind": "component",
+      "label": "Does\n **HD-sEMG** \nwork/see signal?",
+      "align": "center",
+      "position": {
+        "x": 1138.5733971581026,
+        "y": 50.9196481472723
+      }
+    },
+    {
+      "id": "i-imu",
+      "kind": "component",
+      "label": "Does \n**IMU** \nwork?\n*(residual movement)*",
+      "align": "center",
+      "position": {
+        "x": 1498.6390158215459,
+        "y": 41.81281107910664
+      }
+    },
+    {
+      "id": "i-none",
+      "kind": "failure",
+      "label": "**NONE**\n*no usable signal source*",
+      "align": "center",
+      "position": {
+        "x": 1958.2240646785592,
+        "y": 56.163413950226
+      }
+    },
+    {
+      "id": "i-residual",
+      "kind": "action",
+      "label": "Residual movements",
+      "position": {
+        "x": 1504.0075832167956,
+        "y": 1239.2720111876142
+      }
+    },
+    {
+      "id": "ii-artifacts",
+      "kind": "experiment",
+      "label": "**II** · Do we see stim artifacts?",
+      "position": {
+        "x": 1.1943130639398873,
+        "y": 419.7702501409983
+      }
+    },
+    {
+      "id": "ii-fixed-hz",
+      "kind": "experiment",
+      "label": "At fixed Hz?",
+      "position": {
+        "x": 440,
+        "y": 420
+      }
+    },
+    {
+      "id": "ii-template",
+      "kind": "action",
+      "label": "Template removal",
+      "colorToken": "sky",
+      "position": {
+        "x": 438.9007208008702,
+        "y": 617.0878598621752
+      }
+    },
+    {
+      "id": "ii-blanking",
+      "kind": "action",
+      "label": "Blanking",
+      "colorToken": "sky",
+      "position": {
+        "x": 655.0713468203934,
+        "y": 616.476371905744
+      }
+    },
+    {
+      "id": "ii-preproc",
+      "kind": "action",
+      "label": "Classic EMG preproc",
+      "colorToken": "sky",
+      "position": {
+        "x": 24.704296647215386,
+        "y": 623.2410166358944
+      }
+    },
+    {
+      "id": "iii-decompose",
+      "kind": "experiment",
+      "label": "Can we decompose *unique* motor units?",
+      "align": "center",
+      "position": {
+        "x": 6.018609260003586,
+        "y": 1236.7069760751608
+      }
+    },
+    {
+      "id": "iii-mud",
+      "kind": "action",
+      "label": "Motor unit decomposition",
+      "colorToken": "sky",
+      "position": {
+        "x": 17.627910693551257,
+        "y": 1415.7395342890318
+      }
+    },
+    {
+      "id": "iii-controllable",
+      "kind": "experiment",
+      "label": "Is their Firing Rate Controllable?\n*(online)*",
+      "align": "center",
+      "position": {
+        "x": 4.748838919033574,
+        "y": 1590.9023253583869
+      }
+    },
+    {
+      "id": "iii-prop-control",
+      "kind": "action",
+      "label": "Prop. control",
+      "position": {
+        "x": 46.65116427742049,
+        "y": 1770.9023253583869
+      }
+    },
+    {
+      "id": "iii-tonic",
+      "kind": "experiment",
+      "label": "Are they tonic units?\n(Can they be shut off)",
+      "position": {
+        "x": 418.6597294745575,
+        "y": 1595.0839280504429
+      }
+    },
+    {
+      "id": "iii-class-control",
+      "kind": "action",
+      "label": "Class. control",
+      "position": {
+        "x": 431.47424029882905,
+        "y": 1766.4842834334897
+      }
+    },
+    {
+      "id": "iii-cnn-trials",
+      "kind": "experiment",
+      "label": "Do we have enough trials to train a **CNN**?",
+      "position": {
+        "x": 796,
+        "y": 1231.9732800888135
+      }
+    },
+    {
+      "id": "iii-ml",
+      "kind": "action",
+      "label": "Machine learning\n*(classical)*",
+      "colorToken": "sky",
+      "position": {
+        "x": 830,
+        "y": 1576
+      }
+    },
+    {
+      "id": "iii-dl",
+      "kind": "action",
+      "label": "Deep learning",
+      "colorToken": "sky",
+      "position": {
+        "x": 1161.359587777553,
+        "y": 1240.6256558659522
+      }
+    },
+    {
+      "id": "iii-prop-control-2",
+      "kind": "action",
+      "label": "Prop. control",
+      "position": {
+        "x": 1162.04007986678,
+        "y": 1404
+      }
+    },
+    {
+      "id": "iii-go-to-iv",
+      "kind": "note",
+      "label": "Go to **IV**",
+      "position": {
+        "x": 1162.929872030022,
+        "y": 1543.7795843264844
+      }
+    },
+    {
+      "id": "80c873bc-579e-4801-84b7-f8c554dbe0a1",
+      "kind": "experiment",
+      "label": "Is the Connector Broken?",
+      "position": {
+        "x": -248.1951997492007,
+        "y": 2009.7855242297273
+      }
+    },
+    {
+      "id": "5ab429f9-0840-45d1-b115-330e31c4e456",
+      "kind": "experiment",
+      "label": "Is there Nerve Slippage?",
+      "position": {
+        "x": 320.6489609250116,
+        "y": 2010.934222584724
+      }
+    },
+    {
+      "id": "b130db33-f994-42b1-8759-ed9ea562260f",
+      "kind": "experiment",
+      "label": "Is there significant\n**Foreign Body Reaction**",
+      "align": "center",
+      "position": {
+        "x": 23.187158985261362,
+        "y": 1999.9586859170208
+      }
+    },
+    {
+      "id": "bb1f81c2-f138-441b-ae11-ae0aa97cd767",
+      "kind": "action",
+      "label": "Attempt Recalibration",
+      "colorToken": "sky",
+      "position": {
+        "x": 329.34372699442565,
+        "y": 2175.8998584687633
+      }
+    },
+    {
+      "id": "43b2a323-f2fe-41b5-91a4-a6bab7c941a0",
+      "kind": "action",
+      "label": "Consult Clinician",
+      "colorToken": "butter",
+      "size": {
+        "width": 157,
+        "height": 54
+      },
+      "position": {
+        "x": 38.55817677025129,
+        "y": 2176.5845472643637
+      }
+    },
+    {
+      "id": "4d15e082-4fd2-49a3-9b1c-480ccb9684fe",
+      "kind": "failure",
+      "label": "Working Electrode",
+      "colorToken": "sage",
+      "position": {
+        "x": 341.462420978492,
+        "y": 2450.730090877328
+      }
+    },
+    {
+      "id": "3e79bbc9-f5d1-43af-8bb7-3eaf2eb89b3f",
+      "kind": "failure",
+      "label": "Lost Electrode",
+      "position": {
+        "x": -222.59134956139485,
+        "y": 2446.720425968039
+      }
+    },
+    {
+      "id": "016a61d9-7d60-47b9-ac23-0f7e8305fe25",
+      "kind": "junction",
+      "label": "",
+      "junction": {
+        "edgeId": "1803355b-3467-4a25-a38f-79f1caca4f57",
+        "t": 0.08
+      },
+      "position": {
+        "x": 115.63364251723021,
+        "y": 1833.4481407283179
+      }
+    },
+    {
+      "id": "1762863f-d62b-453f-9892-7fdb5b9501d0",
+      "kind": "experiment",
+      "label": "ARE ALL TIME ELCTRODES WORKING ",
+      "align": "center",
+      "fontSize": 18,
+      "position": {
+        "x": 35.791269898678195,
+        "y": 2618.9214732248647
+      }
+    },
+    {
+      "id": "6f0ebb93-91b8-4f0c-bf7a-a7e8a4a2f7b7",
+      "kind": "experiment",
+      "label": "Which electrodes are broken/non effective?",
+      "align": "center",
+      "fontSize": 18,
+      "position": {
+        "x": 650.4801341704127,
+        "y": 2629.2158064306
+      }
+    },
+    {
+      "id": "eadfd683-a396-43f5-a67d-85035b06cf3e",
+      "kind": "experiment",
+      "label": "Wrist Electrodes \n(Close to the Elbow)",
+      "align": "center",
+      "position": {
+        "x": 926.578460762739,
+        "y": 2512.1379624400693
+      }
+    },
+    {
+      "id": "5f5d148f-0d4e-465d-9c70-422411f012fb",
+      "kind": "experiment",
+      "label": "Real-Time\nExperiments ",
+      "colorToken": "sage",
+      "align": "center",
+      "fontSize": 28,
+      "position": {
+        "x": 54.65260835010815,
+        "y": 3009.3297847452295
+      }
+    },
+    {
+      "id": "33f7aed8-489d-4fec-b296-7a5188d17c74",
+      "kind": "experiment",
+      "label": "Finger Electrodes\n(In the Forearm)",
+      "align": "center",
+      "size": {
+        "width": 159,
+        "height": 71
+      },
+      "position": {
+        "x": 931.8316350711756,
+        "y": 2749.8626769308544
+      }
+    },
+    {
+      "id": "59103693-af3b-44da-8f03-6ff486407be7",
+      "kind": "action",
+      "label": "Add Wrist Stabilizer ",
+      "position": {
+        "x": 1205.2531929677018,
+        "y": 2520.5183215854186
+      }
+    },
+    {
+      "id": "d4812a1c-0d5f-4c24-b6ac-ba332c51b2d3",
+      "kind": "action",
+      "label": "Add Soft Exoskeleton",
+      "position": {
+        "x": 1209.5483070447087,
+        "y": 2759.822913673673
+      }
+    },
+    {
+      "id": "7d823193-e03b-4a08-96b4-c96814f98715",
+      "kind": "experiment",
+      "label": "Is it enough to Move?",
+      "position": {
+        "x": 1477.3225791188709,
+        "y": 2760.7060669267894
+      }
+    },
+    {
+      "id": "89db4501-dde8-4d32-ab4d-682e13f3577b",
+      "kind": "action",
+      "label": "Add FES",
+      "position": {
+        "x": 1808.8511831778014,
+        "y": 2761.5400154764857
+      }
+    },
+    {
+      "id": "13ed4f28-de07-4a78-ac7e-6f74db6f53c7",
+      "kind": "note",
+      "label": "Check for Stim Artifacts Again",
+      "position": {
+        "x": 2067.843363286893,
+        "y": 2752.2113013766084
+      }
+    },
+    {
+      "id": "f3545489-16d9-4786-a97c-557d51a78b96",
+      "kind": "experiment",
+      "label": "Test Stimulation at Rest",
+      "colorToken": "sage",
+      "position": {
+        "x": 15.901212480213161,
+        "y": 267.14770340507937
+      }
+    },
+    {
+      "id": "644d926b-dd39-4014-8c3b-bead967e5f83",
+      "kind": "experiment",
+      "label": "CALIBRATION \nEXPERIMENTS",
+      "colorToken": "sage",
+      "align": "center",
+      "fontSize": 28,
+      "position": {
+        "x": 2.414670522785883,
+        "y": 915.1704341593318
+      }
+    },
+    {
+      "id": "fb5a4e18-6e1d-4ab5-b3bd-3531b179be3b",
+      "kind": "action",
+      "label": "Reposition Patient,\n try again",
+      "position": {
+        "x": 426.39886680596453,
+        "y": 1414.3617420736225
+      }
+    },
+    {
+      "id": "0dec49a7-bda9-465b-9163-2c1aa84cd30a",
+      "kind": "junction",
+      "label": "",
+      "junction": {
+        "edgeId": "e18",
+        "t": 0.08
+      },
+      "position": {
+        "x": 276.54943377480834,
+        "y": 1266.620936416913
+      }
+    },
+    {
+      "id": "7a3aed17-ef53-4db3-9422-007e3f06a850",
+      "kind": "junction",
+      "label": "",
+      "junction": {
+        "edgeId": "e19",
+        "t": 0.08
+      },
+      "position": {
+        "x": 113.13919668497762,
+        "y": 1473.8071992769162
+      }
+    },
+    {
+      "id": "094a44f9-b7b6-44da-8588-63538af83941",
+      "kind": "experiment",
+      "label": "Can We Reimplant?",
+      "position": {
+        "x": 295.0593863995208,
+        "y": 61.91420143069031
+      }
+    },
+    {
+      "id": "18bf99b1-bfac-408a-82d3-6c70248d6e31",
+      "kind": "experiment",
+      "label": "Can We Reimplant?",
+      "position": {
+        "x": 875.0336939837069,
+        "y": 65.96179635248464
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e03",
+      "from": "i-hd-semg",
+      "to": "i-imu",
+      "kind": "if-fails",
+      "label": "NO",
+      "straight": true,
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e04",
+      "from": "i-imu",
+      "to": "i-none",
+      "kind": "if-fails",
+      "label": "NO",
+      "straight": true,
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e08",
+      "from": "i-imu",
+      "to": "i-residual",
+      "kind": "leads-to",
+      "label": "YES",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e09",
+      "from": "i-residual",
+      "to": "iii-class-control",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "e11",
+      "from": "ii-artifacts",
+      "to": "ii-preproc",
+      "kind": "mitigated-by",
+      "label": "NO",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e12",
+      "from": "ii-fixed-hz",
+      "to": "ii-template",
+      "kind": "mitigated-by",
+      "label": "YES",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e13",
+      "from": "ii-fixed-hz",
+      "to": "ii-blanking",
+      "kind": "if-fails",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "e14",
+      "from": "ii-template",
+      "to": "ii-preproc",
+      "kind": "leads-to",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "e17",
+      "from": "iii-decompose",
+      "to": "iii-mud",
+      "kind": "leads-to",
+      "label": "YES",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e18",
+      "from": "iii-decompose",
+      "to": "iii-cnn-trials",
+      "kind": "if-fails",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e19",
+      "from": "iii-mud",
+      "to": "iii-controllable",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e20",
+      "from": "iii-controllable",
+      "to": "iii-prop-control",
+      "kind": "leads-to",
+      "label": "yes",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e21",
+      "from": "iii-controllable",
+      "to": "iii-tonic",
+      "kind": "if-fails",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e23",
+      "from": "iii-tonic",
+      "to": "iii-class-control",
+      "kind": "mitigated-by",
+      "label": "NO",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e24",
+      "from": "iii-cnn-trials",
+      "to": "iii-dl",
+      "kind": "leads-to",
+      "label": "YES",
+      "straight": true,
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e25",
+      "from": "iii-cnn-trials",
+      "to": "iii-ml",
+      "kind": "if-fails",
+      "label": "NO",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e26",
+      "from": "iii-dl",
+      "to": "iii-prop-control-2",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e27",
+      "from": "iii-prop-control-2",
+      "to": "iii-go-to-iv",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "82b25ded-c5e0-41b7-ba39-e9d027c4f1fa",
+      "from": "iii-ml",
+      "to": "iii-class-control",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "7d2bfdf9-6a89-4820-bb2c-6a670a36c4eb",
+      "from": "iii-prop-control",
+      "to": "80c873bc-579e-4801-84b7-f8c554dbe0a1",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "b39ff3e5-82b0-4549-ad93-f5d2bea719b1",
+      "from": "5ab429f9-0840-45d1-b115-330e31c4e456",
+      "to": "bb1f81c2-f138-441b-ae11-ae0aa97cd767",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "7fcf0515-df81-44a9-9a07-65418b0d79cb",
+      "from": "b130db33-f994-42b1-8759-ed9ea562260f",
+      "to": "43b2a323-f2fe-41b5-91a4-a6bab7c941a0",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "1803355b-3467-4a25-a38f-79f1caca4f57",
+      "from": "iii-prop-control",
+      "to": "b130db33-f994-42b1-8759-ed9ea562260f",
+      "kind": "leads-to",
+      "label": "FOR EACH ELECTRODE CHECK:",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "152c156a-9f3e-48ad-81dd-4d7fab1241cc",
+      "from": "iii-prop-control",
+      "to": "5ab429f9-0840-45d1-b115-330e31c4e456",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "0d2d1ee5-519d-44ef-ace1-b48575595661",
+      "from": "iii-class-control",
+      "to": "016a61d9-7d60-47b9-ac23-0f7e8305fe25",
+      "kind": "leads-to",
+      "fromSide": "bottom"
+    },
+    {
+      "id": "e8b72a37-9908-4124-a3b9-19ad075009af",
+      "from": "43b2a323-f2fe-41b5-91a4-a6bab7c941a0",
+      "to": "bb1f81c2-f138-441b-ae11-ae0aa97cd767",
+      "kind": "leads-to",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "e3b65cea-adef-4ad7-8632-9ff489fd9768",
+      "from": "80c873bc-579e-4801-84b7-f8c554dbe0a1",
+      "to": "3e79bbc9-f5d1-43af-8bb7-3eaf2eb89b3f",
+      "kind": "if-fails",
+      "label": "YES",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "85fa70ac-f65a-436d-ba32-20ff2900de61",
+      "from": "bb1f81c2-f138-441b-ae11-ae0aa97cd767",
+      "to": "4d15e082-4fd2-49a3-9b1c-480ccb9684fe",
+      "kind": "mitigated-by",
+      "label": "MOVEMENT RESTORED",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "be66475c-0158-4c90-962e-693f470c8361",
+      "from": "bb1f81c2-f138-441b-ae11-ae0aa97cd767",
+      "to": "3e79bbc9-f5d1-43af-8bb7-3eaf2eb89b3f",
+      "kind": "if-fails",
+      "label": "NO RESULTS",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "0041bc89-b4fc-49b4-8430-dcdc04ca4d31",
+      "from": "43b2a323-f2fe-41b5-91a4-a6bab7c941a0",
+      "to": "3e79bbc9-f5d1-43af-8bb7-3eaf2eb89b3f",
+      "kind": "if-fails",
+      "label": "NO GO",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "d25411bd-82d2-4363-99f2-2dff8ca9fbce",
+      "from": "80c873bc-579e-4801-84b7-f8c554dbe0a1",
+      "to": "b130db33-f994-42b1-8759-ed9ea562260f",
+      "kind": "leads-to",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "233541c7-4ad7-4e36-b7d7-4a7d307640f5",
+      "from": "b130db33-f994-42b1-8759-ed9ea562260f",
+      "to": "5ab429f9-0840-45d1-b115-330e31c4e456",
+      "kind": "leads-to",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "74b87c30-2235-4387-b761-5b9f99317112",
+      "from": "5ab429f9-0840-45d1-b115-330e31c4e456",
+      "to": "4d15e082-4fd2-49a3-9b1c-480ccb9684fe",
+      "kind": "mitigated-by",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "2ac6b601-b7d5-47b2-99dd-c9561bd51450",
+      "from": "3e79bbc9-f5d1-43af-8bb7-3eaf2eb89b3f",
+      "to": "1762863f-d62b-453f-9892-7fdb5b9501d0",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "420306f1-db92-4a3d-92dd-e032a8a9fcc9",
+      "from": "4d15e082-4fd2-49a3-9b1c-480ccb9684fe",
+      "to": "1762863f-d62b-453f-9892-7fdb5b9501d0",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "d265e203-73e6-4ee0-b5ab-00394707eea8",
+      "from": "1762863f-d62b-453f-9892-7fdb5b9501d0",
+      "to": "6f0ebb93-91b8-4f0c-bf7a-a7e8a4a2f7b7",
+      "kind": "leads-to",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "f7356a45-0efc-4c41-9e64-dbf5365da5c0",
+      "from": "1762863f-d62b-453f-9892-7fdb5b9501d0",
+      "to": "5f5d148f-0d4e-465d-9c70-422411f012fb",
+      "kind": "leads-to",
+      "label": "YES",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "5e70063e-cab0-4dfd-8b16-10cea71f1967",
+      "from": "6f0ebb93-91b8-4f0c-bf7a-a7e8a4a2f7b7",
+      "to": "eadfd683-a396-43f5-a67d-85035b06cf3e",
+      "kind": "leads-to",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "75940b10-c60a-440c-931c-1e29e4c6672d",
+      "from": "6f0ebb93-91b8-4f0c-bf7a-a7e8a4a2f7b7",
+      "to": "33f7aed8-489d-4fec-b296-7a5188d17c74",
+      "kind": "leads-to",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "cb72eeea-8250-4a77-8ea4-5eaf2c507b03",
+      "from": "eadfd683-a396-43f5-a67d-85035b06cf3e",
+      "to": "59103693-af3b-44da-8f03-6ff486407be7",
+      "kind": "leads-to",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "2439cb4f-bb92-4d8f-8f73-9d46ec21c23a",
+      "from": "33f7aed8-489d-4fec-b296-7a5188d17c74",
+      "to": "d4812a1c-0d5f-4c24-b6ac-ba332c51b2d3",
+      "kind": "leads-to",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "eb4429f9-9aa7-45a8-8294-7b0caf7f3c17",
+      "from": "d4812a1c-0d5f-4c24-b6ac-ba332c51b2d3",
+      "to": "7d823193-e03b-4a08-96b4-c96814f98715",
+      "kind": "leads-to",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "545665f0-2b24-4c96-9ddc-50aef54374b7",
+      "from": "7d823193-e03b-4a08-96b4-c96814f98715",
+      "to": "89db4501-dde8-4d32-ab4d-682e13f3577b",
+      "kind": "leads-to",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "37f28f3f-b7cb-45f3-b40b-5f8e90069ebf",
+      "from": "89db4501-dde8-4d32-ab4d-682e13f3577b",
+      "to": "13ed4f28-de07-4a78-ac7e-6f74db6f53c7",
+      "kind": "leads-to",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "eb4d0bd5-53a7-4a5a-b926-4721a48901f7",
+      "from": "13ed4f28-de07-4a78-ac7e-6f74db6f53c7",
+      "to": "5f5d148f-0d4e-465d-9c70-422411f012fb",
+      "kind": "leads-to",
+      "label": "DECODING REMAINS POSSIBLE",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "c8d19878-5803-48b9-8cd1-ba486276cb62",
+      "from": "i-hd-iemg-3",
+      "to": "f3545489-16d9-4786-a97c-557d51a78b96",
+      "kind": "leads-to",
+      "straight": true,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "87c20ad9-a3a2-4074-908b-9fd17cb651ce",
+      "from": "i-hd-iemg-2",
+      "to": "f3545489-16d9-4786-a97c-557d51a78b96",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "946b5757-49b1-4dab-83a2-a35c79755f4b",
+      "from": "i-hd-semg",
+      "to": "f3545489-16d9-4786-a97c-557d51a78b96",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "c0b02799-73c6-4545-aad4-4f0d11f38e95",
+      "from": "f3545489-16d9-4786-a97c-557d51a78b96",
+      "to": "ii-artifacts",
+      "kind": "leads-to",
+      "straight": true,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "9093b4e8-28db-4824-852e-c501bf488f32",
+      "from": "ii-artifacts",
+      "to": "ii-fixed-hz",
+      "kind": "if-fails",
+      "label": "YES",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "aa2b171f-4102-427c-8ba7-c38053539e77",
+      "from": "ii-preproc",
+      "to": "644d926b-dd39-4014-8c3b-bead967e5f83",
+      "kind": "leads-to",
+      "straight": true,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "f3fde3b4-4938-4358-b044-ba77c8ec6902",
+      "from": "644d926b-dd39-4014-8c3b-bead967e5f83",
+      "to": "iii-decompose",
+      "kind": "leads-to",
+      "straight": true,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "a8afb828-ba4d-48a4-bb5f-4d7f295217de",
+      "from": "iii-tonic",
+      "to": "fb5a4e18-6e1d-4ab5-b3bd-3531b179be3b",
+      "kind": "mitigated-by",
+      "label": "YES",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "55800a62-18e2-4005-8e8e-e5b7a29f13dd",
+      "from": "fb5a4e18-6e1d-4ab5-b3bd-3531b179be3b",
+      "to": "0dec49a7-bda9-465b-9163-2c1aa84cd30a",
+      "kind": "if-fails",
+      "label": "Still Only Tonic Units",
+      "fromSide": "top"
+    },
+    {
+      "id": "085dec2e-acb7-4621-a2ba-f8969a551545",
+      "from": "fb5a4e18-6e1d-4ab5-b3bd-3531b179be3b",
+      "to": "iii-controllable",
+      "kind": "leads-to",
+      "label": "Some Non Tonic Found",
+      "fromSide": "left",
+      "toSide": "top"
+    },
+    {
+      "id": "bb53ec10-495b-4218-8872-a87867821d34",
+      "from": "i-hd-iemg-3",
+      "to": "094a44f9-b7b6-44da-8588-63538af83941",
+      "kind": "if-fails",
+      "label": "NO",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "c9d132b3-361c-4f1a-8ee4-bf5baffbc254",
+      "from": "094a44f9-b7b6-44da-8588-63538af83941",
+      "to": "i-hd-iemg-2",
+      "kind": "if-fails",
+      "label": "NO",
+      "straight": true,
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "43521e39-e14a-4969-8aab-144868d2db3b",
+      "from": "094a44f9-b7b6-44da-8588-63538af83941",
+      "to": "i-hd-iemg-3",
+      "kind": "mitigated-by",
+      "label": "YES",
+      "fromSide": "top",
+      "toSide": "top"
+    },
+    {
+      "id": "0d30937c-e9f3-46cd-939c-ed3aa7baac25",
+      "from": "i-hd-iemg-2",
+      "to": "18bf99b1-bfac-408a-82d3-6c70248d6e31",
+      "kind": "if-fails",
+      "label": "NO",
+      "straight": true,
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "8297cd36-7fe8-4710-a71a-fecc82bbcc30",
+      "from": "18bf99b1-bfac-408a-82d3-6c70248d6e31",
+      "to": "i-hd-semg",
+      "kind": "if-fails",
+      "label": "NO",
+      "straight": true,
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "64ca7708-b4fc-4eb5-86d4-4c1243776d72",
+      "from": "18bf99b1-bfac-408a-82d3-6c70248d6e31",
+      "to": "i-hd-iemg-2",
+      "kind": "mitigated-by",
+      "label": "YES",
+      "fromSide": "top",
+      "toSide": "top"
+    },
+    {
+      "id": "6d58ed95-5017-4363-9a17-e2508753f1ef",
+      "from": "ii-blanking",
+      "to": "ii-preproc",
+      "kind": "leads-to",
+      "fromSide": "bottom",
+      "toSide": "right"
+    }
+  ]
+}

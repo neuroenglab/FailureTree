@@ -1,5 +1,7 @@
 <script lang="ts">
   import { tree } from '../state/tree.svelte';
+  import { EXAMPLE_TREES } from '../examples';
+  import { parseTree } from '../persistence/serializer';
   import { downloadJson, readJsonFile } from '../export/json';
   import { exportPng } from '../export/image';
   import { exportSvg } from '../export/svg';
@@ -22,7 +24,20 @@
   function onPick(event: Event): void {
     const id = (event.currentTarget as HTMLSelectElement).value;
     if (id === '__new__') tree.newTree();
+    else if (id.startsWith('example:')) void openExample(id.slice('example:'.length));
     else tree.openTree(id);
+  }
+
+  /** Fetch a bundled example and import it as a fresh copy. */
+  async function openExample(url: string): Promise<void> {
+    importError = '';
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Could not load example (${response.status}).`);
+      tree.importTree(parseTree(await response.text()));
+    } catch (error) {
+      importError = error instanceof Error ? error.message : 'Could not load example.';
+    }
   }
 
   async function onImportFile(event: Event): Promise<void> {
@@ -51,6 +66,11 @@
       <option value={t.id}>{t.name}</option>
     {/each}
     <option value="__new__">＋ New tree…</option>
+    <optgroup label="Examples">
+      {#each EXAMPLE_TREES as ex (ex.url)}
+        <option value={`example:${ex.url}`}>{ex.label}</option>
+      {/each}
+    </optgroup>
   </select>
 
   <input
