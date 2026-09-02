@@ -1,6 +1,7 @@
 <script lang="ts">
   import FlowCanvas from './canvas/FlowCanvas.svelte';
   import NodeInspector from './ui/NodeInspector.svelte';
+  import SelectionBar from './ui/SelectionBar.svelte';
   import SettingsMenu from './ui/SettingsMenu.svelte';
   import TreeSwitcher from './ui/TreeSwitcher.svelte';
   import { tree } from './state/tree.svelte';
@@ -72,6 +73,7 @@
   <main class="canvas-area">
     <FlowCanvas />
     <NodeInspector />
+    <SelectionBar />
   </main>
 </div>
 

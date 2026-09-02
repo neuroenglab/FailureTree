@@ -33,7 +33,15 @@ class TreeStore {
   private undoStack = $state.raw<Snapshot[]>([]);
   private redoStack = $state.raw<Snapshot[]>([]);
   private saveTimer: ReturnType<typeof setTimeout> | undefined;
-  private clipboard: Snapshot | null = null;
+  private clipboard = $state.raw<Snapshot | null>(null);
+
+  get hasClipboard(): boolean {
+    return this.clipboard !== null;
+  }
+
+  get selectionCount(): number {
+    return this.nodes.filter((n) => n.selected).length + this.edges.filter((e) => e.selected).length;
+  }
 
   get selectedNode(): FlowNode | undefined {
     return this.nodes.find((n) => n.selected);
@@ -261,6 +269,18 @@ class TreeStore {
     this.snapshot();
     const nodeIds = new Set<string>();
     const edgeIds = new Set([id]);
+    this.expandDeletion(nodeIds, edgeIds);
+    this.nodes = this.nodes.filter((n) => !nodeIds.has(n.id));
+    this.edges = this.edges.filter((e) => !edgeIds.has(e.id));
+    this.scheduleSave();
+  }
+
+  /** Delete everything currently selected (with junction cascades). */
+  removeSelection(): void {
+    const nodeIds = new Set(this.nodes.filter((n) => n.selected).map((n) => n.id));
+    const edgeIds = new Set(this.edges.filter((e) => e.selected).map((e) => e.id));
+    if (nodeIds.size === 0 && edgeIds.size === 0) return;
+    this.snapshot();
     this.expandDeletion(nodeIds, edgeIds);
     this.nodes = this.nodes.filter((n) => !nodeIds.has(n.id));
     this.edges = this.edges.filter((e) => !edgeIds.has(e.id));

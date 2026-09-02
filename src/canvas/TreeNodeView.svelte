@@ -164,4 +164,13 @@
   .tree-node.selected :global(.svelte-flow__handle) {
     opacity: 1;
   }
+
+  /* Finger-sized connection handles on touch devices (no hover there). */
+  @media (pointer: coarse) {
+    .tree-node :global(.svelte-flow__handle) {
+      width: 20px;
+      height: 20px;
+      opacity: 0.7;
+    }
+  }
 </style>

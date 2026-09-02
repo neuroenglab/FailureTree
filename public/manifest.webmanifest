@@ -1,0 +1,16 @@
+{
+  "name": "FailureTree",
+  "short_name": "FailureTree",
+  "description": "Failure-mode trees for planning experiments",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#faf6ef",
+  "theme_color": "#fffdf8",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

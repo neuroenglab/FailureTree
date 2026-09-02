@@ -13,6 +13,18 @@
   --xy-edge-label-background-color: transparent;
 }
 
+/* Bigger grab targets for fingers. */
+@media (pointer: coarse) {
+  .svelte-flow__resize-control.handle {
+    width: 16px;
+    height: 16px;
+  }
+
+  .svelte-flow__edge-interaction {
+    stroke-width: 34;
+  }
+}
+
 .svelte-flow__connection-path {
   stroke: var(--ink-muted);
   stroke-width: 2.2;

@@ -85,6 +85,7 @@
     selectionOnDrag
     selectionMode={SelectionMode.Partial}
     panOnDrag={[1, 2]}
+    zoomOnPinch
     onnodedragstart={() => tree.snapshot()}
     onnodedragstop={() => tree.nodesMoved()}
     onbeforedelete={async ({ nodes, edges }) => {

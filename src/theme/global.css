@@ -422,4 +422,7 @@ body {
   color: var(--ink-strong);
   background: var(--surface-canvas);
   overflow: hidden;
+  /* iOS: no rubber-band bounce, no long-press callouts on the canvas. */
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
 }

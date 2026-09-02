@@ -241,6 +241,18 @@
     opacity: 0.35;
   }
 
+  @media (pointer: coarse) {
+    .grip {
+      width: 18px;
+      left: -9px;
+    }
+
+    .swatch {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
   .kind-tag {
     font-size: 0.62rem;
     font-weight: 800;
